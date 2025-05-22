@@ -24,7 +24,7 @@ class ComicReader:
             self.handle_detect_objects(page)
 
             if i == 0:
-                comic.page_pairs.append((page,None))
+                comic.page_pairs.append((None,page))
             else:
                 pages.append(page)
 
