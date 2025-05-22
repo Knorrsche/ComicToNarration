@@ -31,7 +31,7 @@ app.mount("/static", StaticFiles(directory=r"C:\Users\derra\PycharmProjects\Comi
 
 @app.get("/get-comic")
 def get_comic():
-    image_name = "Edgecase_bubble_no_entity.png"
+    image_name = "Starting_page.png"
     image_path = rf"C:\Users\derra\PycharmProjects\ComicToNarration\Data\{image_name}"
 
     image = iu.read_image(image_path)
