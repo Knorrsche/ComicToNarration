@@ -30,7 +30,7 @@ class SpeechBubble:
     def to_xml(self):
         element = ET.Element('SpeechBubble')
         ET.SubElement(element, 'Type').text = self.type
-        ET.SubElement(element, 'Text').text = IOUtils.escape_text(self.text) if self.text else ''
+        ET.SubElement(element, 'Text').text = io_utils.escape_text(self.text) if self.text else ''
         ET.SubElement(element, 'Speaker_Id').text = str(self.speaker_id)
         bbox = ET.SubElement(element, 'BoundingBox')
         bbox.text = ','.join(f"{key}:{value}" for key, value in self.bounding_box.items())

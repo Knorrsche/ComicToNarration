@@ -1,23 +1,40 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import BoundingBoxViewer from "./components/BoundingBoxViewer.vue";
+import Header from './components/Header.vue'
+import InfoBox from "./components/InfoBox.vue";
+import GraphicNovelDifference from "./components/GraphicNovelDifference.vue";
+import ComicParts from "./components/ComicParts.vue";
+import Challenges from "./components/Challenges.vue";
+import SegmentPanelsViewer from './components/SegmentPanelsViewer.vue'
+import BoundingBoxViewer from './components/BoundingBoxViewer.vue'
 </script>
 
 <template>
-  <BoundingBoxViewer/>
-</template>
+  <div class="page-container">
+    <Header />
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+    <section class="top-section">
+      <InfoBox></InfoBox>
+    </section>
+
+        <section class="top-middle-section">
+      <GraphicNovelDifference></GraphicNovelDifference>
+    </section>
+
+    <section class="middle-middle-section">
+      <ComicParts></ComicParts>
+    </section>
+
+
+    <section class="middle-middle-middle-section">
+      <Challenges></Challenges>
+    </section>
+
+    <section class="middle-section">
+      <SegmentPanelsViewer />
+    </section>
+
+    <section class="bottom-section">
+      <BoundingBoxViewer />
+    </section>
+  </div>
+</template>
