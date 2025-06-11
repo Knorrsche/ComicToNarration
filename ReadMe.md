@@ -1,1 +1,3 @@
-Get weights from: https://github.com/barisbatuhan/DASS_Det_Inference#pre-trained-weights
+```bash
+uvicorn src.Components.backend:app
+```

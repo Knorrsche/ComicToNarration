@@ -1,78 +1,29 @@
-import os
+import cv2
 import numpy as np
-from PIL import Image
-import imageio
-from skimage.color import rgb2gray
-from skimage.feature import canny
-from skimage.morphology import dilation, square
-from scipy import ndimage as ndi
-from skimage.measure import label, regionprops
-from skimage.draw import rectangle_perimeter
 
-def save_image(array, path, mode='L'):
-    """Save a NumPy array as an image."""
-    img = Image.fromarray((array * 255).astype(np.uint8)) if array.dtype != np.uint8 else Image.fromarray(array)
-    if mode == 'RGB':
-        img = img.convert('RGB')
-    img.save(path)
 
-def segment_panels(image_path, output_dir):
-    os.makedirs(output_dir, exist_ok=True)
+def detect_panels(image, blur_kernel=5, thresh_val=200, morph_kernel=5, min_size=50):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    blur = cv2.GaussianBlur(gray, (blur_kernel, blur_kernel), 0)
+    _, thresh = cv2.threshold(blur, thresh_val, 255, cv2.THRESH_BINARY_INV)
+    kernel = np.ones((morph_kernel, morph_kernel), np.uint8)
+    closed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+    contours, _ = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    for cnt in contours:
+        x, y, w, h = cv2.boundingRect(cnt)
+        if w > min_size and h > min_size:
+            cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    return image
 
-    # Load image
-    image = imageio.imread(image_path)
-    save_image(image, os.path.join(output_dir, 'original.png'), mode='RGB')
 
-    # Convert to grayscale
-    # Remove alpha channel if present
-    if image.shape[-1] == 4:
-        image = image[..., :3]
-
-    # Convert to grayscale
-    gray = rgb2gray(image)
-    save_image(gray, os.path.join(output_dir, 'grayscale.png'))
-
-    save_image(gray, os.path.join(output_dir, 'grayscale.png'))
-
-    # Apply Canny edge detection
-    edges = canny(gray)
-    save_image(edges, os.path.join(output_dir, 'edges.png'))
-
-    # Dilate edges to close gaps
-    thick_edges = dilation(edges, square(3))
-    thick_edges = dilation(thick_edges, square(3))
-    save_image(thick_edges, os.path.join(output_dir, 'dilated_edges.png'))
-
-    # Fill holes to create solid panel regions
-    filled = ndi.binary_fill_holes(thick_edges)
-    save_image(filled, os.path.join(output_dir, 'filled.png'))
-
-    # Label connected regions and draw boxes
-    label_image = label(filled)
-    labeled_image = np.zeros_like(image)
-    for region in regionprops(label_image):
-        minr, minc, maxr, maxc = region.bbox
-        rr, cc = rectangle_perimeter(start=(minr, minc), end=(maxr, maxc), shape=label_image.shape)
-        labeled_image[rr, cc] = [255, 0, 0]  # Red box
-    save_image(labeled_image, os.path.join(output_dir, 'labeled.png'), mode='RGB')
-
-    # Extract and save individual panels
-    panel_dir = os.path.join(output_dir, 'panels')
-    os.makedirs(panel_dir, exist_ok=True)
-    panel_count = 0
-    for region in regionprops(label_image):
-        minr, minc, maxr, maxc = region.bbox
-        if (maxr - minr) * (maxc - minc) < 1000:
-            continue  # Skip very small regions
-        panel = image[minr:maxr, minc:maxc]
-        panel_path = os.path.join(panel_dir, f'panel_{panel_count:02d}.png')
-        save_image(panel, panel_path, mode='RGB')
-        panel_count += 1
-
-    print(f"Saved {panel_count} panels to '{panel_dir}'.")
-
-# 👇 Hardcoded function call
-segment_panels(
-    image_path=r"C:\Users\derra\PycharmProjects\ComicToNarration\Data\Starting_page.png",
-    output_dir=r"C:\Users\derra\PycharmProjects\ComicToNarration\Data"
-)
+def detect_speech_bubbles(image, bubble_thresh=220, min_area=1000, max_area=10000, approx_factor=0.02):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    _, bin_img = cv2.threshold(gray, bubble_thresh, 255, cv2.THRESH_BINARY)
+    contours, _ = cv2.findContours(bin_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    for cnt in contours:
+        approx = cv2.approxPolyDP(cnt, approx_factor * cv2.arcLength(cnt, True), True)
+        area = cv2.contourArea(cnt)
+        if min_area < area < max_area and len(approx) > 4:
+            x, y, w, h = cv2.boundingRect(cnt)
+            cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+    return image

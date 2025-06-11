@@ -1,3 +1,8 @@
+import cv2
+import uvicorn
+from flask import request, send_file
+from starlette.responses import StreamingResponse
+
 from src.Components.comic_reader import ComicReader
 import xml.etree.ElementTree as ET
 import numpy as np
@@ -11,9 +16,11 @@ from skimage.draw import rectangle_perimeter
 
 import io
 import base64
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+
+from src.Components.cv_panel import detect_panels, detect_speech_bubbles
 
 app = FastAPI()
 ComicReader = ComicReader()
@@ -27,11 +34,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 def image_to_base64_pil(img: Image.Image) -> str:
     """Convert PIL Image to base64 string."""
     buffered = io.BytesIO()
     img.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode()
+
 
 def image_to_base64_np(array: np.ndarray) -> str:
     """Convert numpy image array (HWC, uint8 or bool) to base64 string."""
@@ -44,6 +53,7 @@ def image_to_base64_np(array: np.ndarray) -> str:
     else:
         raise ValueError("Unsupported image shape for base64 conversion")
     return image_to_base64_pil(pil_img)
+
 
 @app.post("/get-comic")
 async def get_comic(file: UploadFile = File(...)):
@@ -65,38 +75,29 @@ async def get_comic(file: UploadFile = File(...)):
         "image": base64_image,
         "annotations": xml_str  # now a JSON-serializable string
     })
-@app.post("/segment-panels")
-async def segment_panels_endpoint(file: UploadFile = File(...)):
+
+
+@app.post("/api/process")
+async def process_image(
+    file: UploadFile = File(...),
+    threshold: int = Form(200),
+    blur: int = Form(5),
+    morph: int = Form(5),
+    min_size: int = Form(50)
+):
     contents = await file.read()
-    image = Image.open(io.BytesIO(contents)).convert("RGB")
-    image_np = np.array(image)
+    data = np.frombuffer(contents, dtype=np.uint8)
+    img = cv2.imdecode(data, cv2.IMREAD_COLOR)
 
-    original_img = image
+    panel_img = detect_panels(img, blur, threshold, morph, min_size)
+    result_img = detect_speech_bubbles(panel_img)
 
-    gray = rgb2gray(image_np)
+    _, img_encoded = cv2.imencode('.png', result_img)
 
-    edges = canny(gray)
+    return StreamingResponse(
+        io.BytesIO(img_encoded.tobytes()),
+        media_type='image/png'
+    )
 
-    thick_edges = dilation(edges, square(3))
-    thick_edges = dilation(thick_edges, square(3))
-
-    filled = ndi.binary_fill_holes(thick_edges)
-
-    label_image = label(filled)
-    labeled_img_np = np.zeros_like(image_np)
-    for region in regionprops(label_image):
-        minr, minc, maxr, maxc = region.bbox
-        rr, cc = rectangle_perimeter(start=(minr, minc), end=(maxr, maxc), shape=label_image.shape)
-        labeled_img_np[rr, cc] = [255, 0, 0]  # Red box
-    labeled_img = Image.fromarray(labeled_img_np)
-
-    results = {
-        "original": image_to_base64_pil(original_img),
-        "grayscale": image_to_base64_np((gray * 255).astype(np.uint8)),
-        "edges": image_to_base64_np(edges),
-        "dilated_edges": image_to_base64_np(thick_edges),
-        "filled": image_to_base64_np(filled),
-        "labeled": image_to_base64_pil(labeled_img),
-    }
-
-    return JSONResponse(results)
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
