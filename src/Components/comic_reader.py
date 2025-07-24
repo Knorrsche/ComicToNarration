@@ -1,3 +1,10 @@
+import base64
+import io
+import os
+
+import numpy as np
+import xml.etree.ElementTree as ET
+
 from src.Utils import image_utils as iu
 from src.Classes.comic import Comic
 from src.Classes.page import Page,PageType
@@ -5,7 +12,7 @@ from src.Classes.panel import Panel
 from src.Classes.speech_bubble import SpeechBubble,SpeechBubbleType
 from src.Classes.entity import Entity
 from Models import magi
-
+from PIL import Image
 
 class ComicReader:
     def __init__(self):
@@ -136,3 +143,34 @@ class ComicReader:
         self.handle_panels(panel_list, page)
         self.handle_entities(entity_list, character_cluster_labels, page)
         self.handle_speechbubbles(speechbubble_list, is_essential_text, page)
+
+
+def read_comics():
+
+    comic = ComicReader()
+    comic_dir = r"C:\Users\derra\PycharmProjects\ComicToNarration\Data\comics"
+    for root, dirs, files in os.walk(comic_dir):
+        for dir_name in dirs:
+            dir_path = os.path.join(root, dir_name)
+            images = []
+
+            for file_name in os.listdir(dir_path):
+                file_path = os.path.join(dir_path, file_name)
+
+                if os.path.isfile(file_path):
+                    try:
+                        img = Image.open(file_path).convert("RGB")
+                        image = np.array(img)
+                        images.append(image)
+                    except Exception as e:
+                        print(f"Error reading {file_path}: {e}")
+
+            comic_reader = ComicReader()
+            comic = comic_reader.read_comic(dir_path, images)
+
+            xml_element = comic.to_xml()
+            xml_bytes = ET.tostring(xml_element, encoding='utf-8')
+            xml_str = xml_bytes.decode('utf-8')
+
+            with open(os.path.join(root, f"{dir_name}.xml"), "w", encoding="utf-8") as f:
+                f.write(xml_str)

@@ -1,6 +1,9 @@
+import os
+
 import cv2
 import uvicorn
-from flask import request, send_file
+from fastapi import FastAPI, Query
+from fastapi.responses import JSONResponse, Response
 from starlette.responses import StreamingResponse
 
 from src.Components.comic_reader import ComicReader
@@ -19,13 +22,20 @@ import base64
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from src.Components.cv_panel import detect_panels, detect_speech_bubbles
 
 app = FastAPI()
 ComicReader = ComicReader()
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", r"Data\comics"))
+
+app.mount("/comics", StaticFiles(directory=DATA_DIR), name="comics")
+
 origins = ["http://localhost:5173"]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -33,6 +43,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 
 def image_to_base64_pil(img: Image.Image) -> str:
@@ -53,29 +64,6 @@ def image_to_base64_np(array: np.ndarray) -> str:
     else:
         raise ValueError("Unsupported image shape for base64 conversion")
     return image_to_base64_pil(pil_img)
-
-
-@app.post("/get-comic")
-async def get_comic(file: UploadFile = File(...)):
-    contents = await file.read()
-    image = Image.open(io.BytesIO(contents)).convert("RGB")
-
-    if not isinstance(image, np.ndarray):
-        image = np.array(image)
-
-    comic = ComicReader.read_comic("uploaded_comic", [image])
-
-    base64_image = image_to_base64_np(image)
-
-    xml_element = comic.to_xml()  # likely an Element object
-    xml_bytes = ET.tostring(xml_element, encoding='utf-8')
-    xml_str = xml_bytes.decode('utf-8')
-
-    return JSONResponse({
-        "image": base64_image,
-        "annotations": xml_str  # now a JSON-serializable string
-    })
-
 
 @app.post("/api/process")
 async def process_image(
@@ -98,6 +86,35 @@ async def process_image(
         io.BytesIO(img_encoded.tobytes()),
         media_type='image/png'
     )
+
+
+@app.get("/comics")
+def list_comics():
+    comics = []
+    if not os.path.exists(DATA_DIR):
+        return JSONResponse(status_code=500, content={"error": f"DATA_DIR not found: {DATA_DIR}"})
+
+    for comic_name in os.listdir(DATA_DIR):
+        comic_path = os.path.join(DATA_DIR, comic_name)
+        if not os.path.isdir(comic_path):
+            continue
+
+        pages = sorted([
+            f for f in os.listdir(comic_path)
+            if f.lower().endswith((".jpg", ".jpeg", ".png"))
+        ])
+        if not pages:
+            continue
+
+        xml_content = os.path.join(DATA_DIR, comic_name + ".xml")
+        comics.append({
+            "name": comic_name,
+            "pages": pages,
+            "annotations": xml_content,
+            "previewImage": pages[0]
+        })
+    return comics
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
