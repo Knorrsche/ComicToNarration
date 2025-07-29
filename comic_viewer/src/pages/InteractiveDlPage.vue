@@ -41,21 +41,6 @@ import ComicScrollPanel from "../components/ComicScrollPanel.vue";
 }
 
 
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(255, 255, 255, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  color: #333;
-  z-index: 9999;
-}
-
 .content-wrapper {
   display: flex;
   width: 100%;

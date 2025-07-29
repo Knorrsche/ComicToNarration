@@ -3,21 +3,28 @@
     <h1>Interactive Comic Panel & Speech Bubble Detection</h1>
 
     <div class="controls">
-      <input type="file" accept="image/*" @change="handleImageUpload" />
       <div class="tab-buttons">
         <button @click="activeTab = 'panel'" :class="{ active: activeTab === 'panel' }">Panel Parameters</button>
         <button @click="activeTab = 'bubble'" :class="{ active: activeTab === 'bubble' }">Bubble Parameters</button>
+      <button @click="perfect_setup">Perfect Setup</button>
       </div>
     </div>
 
-    <div class="main-layout">
-      <div class="image-panel">
+    <div class="content-wrapper">
+      <div class="explanation-box">
+        <h3>Machine Learning in Comics</h3>
+        <p>
+          Deep learning is a subset of machine learning that uses layered neural networks (like CNNs or transformers) to automatically learn features from large datasets. Unlike traditional machine learning, which requires handcrafted features (e.g. edge detectors or geometric rules), deep learning models learn directly from raw pixel data — enabling them to identify complex patterns in comic images.
+        </p>
+        <p>
+          In the context of comics, deep learning allows automatic detection and interpretation of panels, speech bubbles, characters, and even emotions or narrative structure. This mimics how humans visually understand and follow stories, enabling smarter comic viewers and tools.
+        </p>
+      </div>
+          <div class="image-panel">
         <img v-if="processedImageSrc" :src="processedImageSrc" alt="Processed Image" />
         <img v-else-if="imageSrc" :src="imageSrc" alt="Uploaded Image" />
       </div>
-  <p>CHALLENGE: TRY TO FIND THE BEST DETECTION FOR YOU PAGE AND THEN LOOK HWO IT PERFORMS ON A DIFFERENT PAGE TO SEE HOW WELL IT GENERLIZES, NOTE: MAYBE ADD AN OPTION TO THEN TEST
-  YOUR SETUP WITH OUR DATABASE AND GROUNT TRUTH TO SEE THE GENREALIZTION AND THE CHALLENGE OF THIS.
-  NOTE2: USE COMIC, MANGA AND GRAPHIC NOVEL TO ALSO SHOW GENERALIZTION TO DIFFERENT STYLES</p>
+
       <div class="interaction-panel" v-if="imageSrc">
         <h3>Detection Parameters</h3>
 
@@ -54,15 +61,21 @@
             <span title="Pixel intensity threshold to find bright speech bubbles.">ℹ️</span>
           </div>
 
+                  <div class="param-group">
+            <label>Min Circularity: {{ minCircularity }}</label>
+            <input type="range" min="0.01" max="1.0" step="0.01" v-model="minCircularity" />
+            <span title="Minimum degree of circularity of detected patches.">ℹ️</span>
+          </div>
+
           <div class="param-group">
             <label>Bubble Min Area: {{ bubbleMin }}</label>
-            <input type="range" min="100" max="10000" v-model="bubbleMin" />
+            <input type="range" min="0.0001" max="1.0"  step="0.0001" v-model="bubbleMin" />
             <span title="Minimum size (area in pixels) of a bubble to detect.">ℹ️</span>
           </div>
 
           <div class="param-group">
             <label>Bubble Max Area: {{ bubbleMax }}</label>
-            <input type="range" min="1000" max="30000" step="100" v-model="bubbleMax" />
+            <input type="range" min="0.0001" max="1.0" step="0.0001" v-model="bubbleMax" />
             <span title="Maximum size (area in pixels) of a bubble to detect.">ℹ️</span>
           </div>
         </template>
@@ -80,68 +93,73 @@
 <script setup>
 import {ref, watch} from 'vue'
 import debounce from 'lodash/debounce'
+import ComicImage from "../assets/Normal.jpg"
 
-const imageSrc = ref(null)
+const imageSrc = ref(ComicImage)
 const processedImageSrc = ref(null)
 const loading = ref(false)
 const error = ref(null)
 
 const blur = ref(5)
-const threshold = ref(200)
+const threshold = ref(100)
 const morph = ref(5)
-const minSize = ref(50)
-const bubbleThreshold = ref(220)
-const bubbleMin = ref(1000)
-const bubbleMax = ref(10000)
+const minSize = ref(10)
+const bubbleThreshold = ref(150)
+const bubbleMin = ref(0.0001)
+const bubbleMax = ref(0.1)
+const minCircularity = ref(0.4)
 
 const activeTab = ref('panel')
 
-function handleImageUpload(event) {
-  const file = event.target.files[0]
-  if (!file) return
-
-  const reader = new FileReader()
-  reader.onload = () => {
-    imageSrc.value = reader.result
-    processedImageSrc.value = null
-    error.value = null
-  }
-  reader.readAsDataURL(file)
+function perfect_setup() {
+    threshold.value = 100
+    blur.value = 5
+    morph.value = 5
+    minSize.value = 60
+    bubbleThreshold.value = 102
+    bubbleMin.value = 0.0028
+    bubbleMax.value = 0.1
+    minCircularity.value = 0.31
 }
 
 async function applyDetection() {
-  if (!imageSrc.value) return
+  if (!imageSrc.value) return;
 
-  loading.value = true
-  error.value = null
+  loading.value = true;
+  error.value = null;
 
   try {
-    const formData = new FormData()
-    const blob = dataURLtoBlob(imageSrc.value)
-    formData.append('file', blob, 'upload.png')
-    formData.append('blur', blur.value)
-    formData.append('threshold', threshold.value)
-    formData.append('morph', morph.value)
-    formData.append('min_size', minSize.value)
-    formData.append('bubble_thresh', bubbleThreshold.value)
-    formData.append('bubble_min_area', bubbleMin.value)
-    formData.append('bubble_max_area', bubbleMax.value)
+    const formData = new FormData();
 
-    const response = await fetch('http://localhost:8000/api/process', {
+    const imgResponse = await fetch(imageSrc.value);
+    const blob = await imgResponse.blob();
+
+    formData.append('file', blob, 'upload.jpg');
+    formData.append('blur', blur.value);
+    formData.append('threshold', threshold.value);
+    formData.append('morph', morph.value);
+    formData.append('min_size', minSize.value);
+    formData.append('bubble_thresh', bubbleThreshold.value);
+    formData.append('bubble_min_area', bubbleMin.value);
+    formData.append('bubble_max_area', bubbleMax.value);
+    formData.append('min_circularity',minCircularity.value)
+
+    const serverRes = await fetch('http://localhost:8000/api/process', {
       method: 'POST',
       body: formData,
-    })
+    });
 
-    if (!response.ok) throw new Error(`Server error: ${response.statusText}`)
+    if (!serverRes.ok) throw new Error(`Server error: ${serverRes.statusText}`);
 
-    const blobResult = await response.blob()
-    processedImageSrc.value = URL.createObjectURL(blobResult)
+    const blobResult = await serverRes.blob();
+    processedImageSrc.value = URL.createObjectURL(blobResult);
   } catch (err) {
-    error.value = err.message || 'Image processing failed'
+    error.value = err.message || 'Image processing failed';
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
+
 
 function resetImage() {
   processedImageSrc.value = null
@@ -164,7 +182,7 @@ const autoApply = debounce(() => {
   if (imageSrc.value) applyDetection()
 }, 500)
 
-watch([blur, threshold, morph, minSize, bubbleThreshold, bubbleMin, bubbleMax], autoApply)
+watch([blur, threshold, morph, minSize, bubbleThreshold, bubbleMin, bubbleMax,minCircularity], autoApply)
 </script>
 
 <style scoped>
@@ -196,12 +214,36 @@ watch([blur, threshold, morph, minSize, bubbleThreshold, bubbleMin, bubbleMax], 
   color: white;
 }
 
-.main-layout {
+.content-wrapper {
   display: flex;
-  gap: 30px;
+  width: 100%;
+  gap: 40px;
   justify-content: center;
   align-items: flex-start;
-  flex-wrap: wrap;
+}
+
+.explanation-box {
+  flex: 1 1 50%;
+  min-width: 65vh;
+  max-width: 65vh;
+  height: auto;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  user-select: none;
+  color: #333;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.explanation-box p {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.4;
+  margin-bottom: 10px;
 }
 
 .image-panel img {

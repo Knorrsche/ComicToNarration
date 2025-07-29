@@ -61,14 +61,27 @@ async def process_image(
     threshold: int = Form(200),
     blur: int = Form(5),
     morph: int = Form(5),
-    min_size: int = Form(50)
+    min_size: int = Form(50),
+    bubble_thresh: int = Form(220),
+    bubble_min_area: float = Form(0.005),
+    bubble_max_area: float = Form(0.05),
+    min_circularity: float = Form(0.4),
+    use_adaptive: bool = Form(False)
 ):
     contents = await file.read()
     data = np.frombuffer(contents, dtype=np.uint8)
     img = cv2.imdecode(data, cv2.IMREAD_COLOR)
 
     panel_img = detect_panels(img, blur, threshold, morph, min_size)
-    result_img = detect_speech_bubbles(panel_img)
+
+    result_img = detect_speech_bubbles(
+        panel_img,
+        bubble_thresh=bubble_thresh,
+        min_area_ratio=bubble_min_area,
+        max_area_ratio=bubble_max_area,
+        use_adaptive=use_adaptive,
+        min_circularity=min_circularity
+    )
 
     _, img_encoded = cv2.imencode('.png', result_img)
 

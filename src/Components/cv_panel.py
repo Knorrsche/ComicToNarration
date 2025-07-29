@@ -16,14 +16,48 @@ def detect_panels(image, blur_kernel=5, thresh_val=200, morph_kernel=5, min_size
     return image
 
 
-def detect_speech_bubbles(image, bubble_thresh=220, min_area=1000, max_area=10000, approx_factor=0.02):
+import cv2
+import numpy as np
+
+def detect_speech_bubbles(
+    image,
+    bubble_thresh=220,
+    min_area_ratio=0.005,
+    max_area_ratio=0.05,
+        min_circularity = 0.4,
+    use_adaptive=False
+):
+    print(min_circularity)
+    height, width = image.shape[:2]
+    min_area = (width * height) * min_area_ratio
+    max_area = (width * height) * max_area_ratio
+
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    _, bin_img = cv2.threshold(gray, bubble_thresh, 255, cv2.THRESH_BINARY)
-    contours, _ = cv2.findContours(bin_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    for cnt in contours:
-        approx = cv2.approxPolyDP(cnt, approx_factor * cv2.arcLength(cnt, True), True)
+
+    if use_adaptive:
+        bin_img = cv2.adaptiveThreshold(
+            gray, 255,
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY,
+            15, 2
+        )
+        bin_img = cv2.bitwise_not(bin_img)
+    else:
+        _, bin_img = cv2.threshold(gray, bubble_thresh, 255, cv2.THRESH_BINARY)
+        bin_img = cv2.bitwise_not(bin_img)
+
+    contours, hierarchy = cv2.findContours(bin_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    for i, cnt in enumerate(contours):
         area = cv2.contourArea(cnt)
-        if min_area < area < max_area and len(approx) > 4:
-            x, y, w, h = cv2.boundingRect(cnt)
-            cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        if min_area < area < max_area:
+            perimeter = cv2.arcLength(cnt, True)
+            if perimeter == 0:
+                continue
+            circularity = 4 * np.pi * area / (perimeter ** 2)
+            if circularity >= min_circularity:
+                x, y, w, h = cv2.boundingRect(cnt)
+                cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+
     return image
+
