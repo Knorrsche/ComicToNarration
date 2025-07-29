@@ -1,3 +1,4 @@
 ```bash
-uvicorn src.Components.backend:app
+cd comic_viewer
+npm install
 ```

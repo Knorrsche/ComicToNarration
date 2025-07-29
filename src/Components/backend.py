@@ -2,21 +2,11 @@ import os
 
 import cv2
 import uvicorn
-from fastapi import FastAPI, Query
-from fastapi.responses import JSONResponse, Response
 from starlette.responses import StreamingResponse
 
 from src.Components.comic_reader import ComicReader
-import xml.etree.ElementTree as ET
 import numpy as np
 from PIL import Image
-from skimage.color import rgb2gray
-from skimage.feature import canny
-from skimage.morphology import dilation, square
-from scipy import ndimage as ndi
-from skimage.measure import label, regionprops
-from skimage.draw import rectangle_perimeter
-
 import io
 import base64
 from fastapi import FastAPI, UploadFile, File, Form
@@ -30,7 +20,7 @@ app = FastAPI()
 ComicReader = ComicReader()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", r"Data\comics"))
+DATA_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", r"Data/comics"))
 
 app.mount("/comics", StaticFiles(directory=DATA_DIR), name="comics")
 
