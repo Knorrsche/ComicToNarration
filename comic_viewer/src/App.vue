@@ -1,42 +1,75 @@
 <script setup>
 import { RouterView } from 'vue-router'
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const currentSection = ref('header')
+const isSidebarOpen = ref(false)
+
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value
+}
+
+const handleClickOutside = (event) => {
+  if (!event.target.closest('.sidebar') && !event.target.closest('.hamburger')) {
+    isSidebarOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <template>
-   <nav class="sidebar">
-      <ul>
-        <li><a :class="{ active: currentSection === 'header' }" href="/#header">Intro</a></li>
-        <li><a :class="{ active: currentSection === 'info' }" href="/#info">The Visual Impaired</a></li>
-        <li><a :class="{ active: currentSection === 'gn-diff' }" href="/#gn-diff">Types of Graphic Novels</a></li>
-        <li><a :class="{ active: currentSection === 'parts' }" href="/#parts">Parts of Comics</a></li>
-        <li><a :class="{ active: currentSection === 'challenges' }" href="/#challenges">Challenges</a></li>
-        <li><a :class="{ active: currentSection === 'segment' }" href="/ml">Machine Learning</a></li>
-        <li><a :class="{ active: currentSection === 'bounding' }" href="/dl">Deep Learning</a></li>
-      </ul>
-    </nav>
+  <button class="hamburger" @click="toggleSidebar">
+    ☰
+  </button>
+
+<nav class="sidebar" :class="{ open: isSidebarOpen }">
+  <ul>
+    <li><router-link to="/" active-class="active">Intro</router-link></li>
+    <li><router-link to="/info" active-class="active">The Visual Impaired</router-link></li>
+    <li><router-link to="/gn-diff" active-class="active">Types of Graphic Novels</router-link></li>
+    <li><router-link to="/parts" active-class="active">Parts of Comics</router-link></li>
+    <li><router-link to="/challenges" active-class="active">Challenges</router-link></li>
+    <li><router-link to="/ml" active-class="active">Machine Learning</router-link></li>
+    <li><router-link to="/dl" active-class="active">Deep Learning</router-link></li>
+  </ul>
+</nav>
+
   <RouterView />
 </template>
-
+.router-view-wrapper {
+  height: 100vh; /* forces it to exactly match viewport height */
+}
 <style>
-body, html {
+html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+  width: 100%;
 }
-#app {
+
+app {
   height: 100%;
+  display: flex;
 }
+
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
-  width: 200px;
+  width: clamp(150px, 18vw, 250px);
   background-color: #da7434;
-  padding-top: 30px;
+  padding-top: 2rem;
   z-index: 1000;
+  transition: transform 0.3s ease, width 0.3s ease;
 }
-
 .sidebar ul {
   list-style: none;
   padding: 0;
@@ -44,9 +77,8 @@ body, html {
 }
 
 .sidebar li {
-  margin: 20px 0;
+  margin: 1.5rem 0;
   text-align: center;
-  position: relative;
 }
 
 .sidebar a {
@@ -55,15 +87,10 @@ body, html {
   font-weight: bold;
   transition: color 0.3s ease;
   display: block;
-  padding: 10px 0;
-  position: relative;
-  z-index: 1;
+  padding: 0.5rem 0;
 }
 
-.sidebar a:hover {
-  color: #00bfff;
-}
-
+.sidebar a:hover,
 .sidebar a.active {
   color: #00bfff;
 }
@@ -79,5 +106,34 @@ body, html {
   border-radius: 3px;
 }
 
-</style>
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  font-size: 2rem;
+  background: transparent;
+  border: none;
+  color: white;
+  z-index: 1100;
+  cursor: pointer;
+}
 
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+    background: #007bff;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    width: 250px;
+    height: 100vh;
+    padding-top: 2rem;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}
+</style>

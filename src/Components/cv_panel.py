@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+THICKNESS = 2
 
 def detect_panels(image, blur_kernel=5, thresh_val=200, morph_kernel=5, min_size=50):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -12,12 +13,11 @@ def detect_panels(image, blur_kernel=5, thresh_val=200, morph_kernel=5, min_size
     for cnt in contours:
         x, y, w, h = cv2.boundingRect(cnt)
         if w > min_size and h > min_size:
-            cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), THICKNESS)
     return image
 
 
-import cv2
-import numpy as np
+
 
 def detect_speech_bubbles(
     image,
@@ -27,7 +27,6 @@ def detect_speech_bubbles(
         min_circularity = 0.4,
     use_adaptive=False
 ):
-    print(min_circularity)
     height, width = image.shape[:2]
     min_area = (width * height) * min_area_ratio
     max_area = (width * height) * max_area_ratio
@@ -57,7 +56,7 @@ def detect_speech_bubbles(
             circularity = 4 * np.pi * area / (perimeter ** 2)
             if circularity >= min_circularity:
                 x, y, w, h = cv2.boundingRect(cnt)
-                cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), THICKNESS)
 
     return image
 

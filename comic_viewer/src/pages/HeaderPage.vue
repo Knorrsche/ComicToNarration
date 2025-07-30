@@ -10,7 +10,7 @@ import example_mp4 from '../assets/Example_Video.mp4';
     <h2>Enhancing the Accessibility for the Visually Impaired</h2>
 
     <div class="example-images">
-      <video controls playsinline muted preload="metadata" tabindex="0">
+      <video controls playsinline preload="metadata" tabindex="0">
         <source :src="example_mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>

@@ -1,9 +1,8 @@
 <script setup>
-
 import entityMatch from '../assets/clustering.png';
 import speakerID from '../assets/speaker_iden.png';
 import sceneDetect from '../assets/scene.png';
-import ImageExplanationViewer from "./ImageExplanationViewer.vue";
+import ImageExplanationViewer from '../components/ImageExplanationViewer.vue';
 
 const challenges = [
   {
@@ -25,12 +24,20 @@ const challenges = [
       'Scene detection involves recognizing when a comic shifts to a new setting, time period, or narrative thread. These transitions may span multiple panels and are often implied rather than explicitly marked. Artists use subtle signals such as background changes, color palette shifts, or layout transformations. For readers and especially for computational systems, accurately detecting scene boundaries is vital for maintaining a coherent understanding of the story’s structure.'
   }
 ];
-
 </script>
 
 <template>
-  <div className="container">
+  <div class="container">
     <h1>Challenges</h1>
     <ImageExplanationViewer :images="challenges" />
   </div>
 </template>
+
+<style scoped>
+.container {
+  padding: 2rem;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+</style>
