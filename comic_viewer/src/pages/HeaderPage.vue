@@ -1,7 +1,12 @@
 <script setup>
 import example2 from '../assets/Spider_chapter.png';
 import example_mp4 from '../assets/Example_Video.mp4';
-
+const props = defineProps({
+  title: {
+    type: String,
+    required: true
+  }
+})
 </script>
 
 <template>

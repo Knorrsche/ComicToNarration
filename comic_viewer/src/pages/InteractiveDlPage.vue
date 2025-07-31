@@ -10,13 +10,8 @@
         <p>
           In the context of comics, deep learning allows automatic detection and interpretation of panels, speech bubbles, characters, and even emotions or narrative structure. This mimics how humans visually understand and follow stories, enabling smarter comic viewers and tools.
         </p>
-        <p>
-          <strong>Advantages:</strong> Deep learning models are highly flexible and robust to variation. They can handle diverse art styles, irregular layouts, and noisy backgrounds better than rule-based methods. With enough data, they generalize well across genres and languages, making them suitable for tasks like panel segmentation, speaker identification, or even automatic comic translation.
-        </p>
-        <p>
-          <strong>Limitations:</strong> Deep learning systems require large labeled datasets and substantial computational resources to train. They can also be opaque ("black boxes"), making it hard to understand why a model made a certain decision — which is problematic for transparency or debugging. Additionally, if the training data is biased or limited, the system may fail to generalize.
-        </p>
       </div>
+
       <ComicScrollPanel></ComicScrollPanel>
     </div>
   </div>
@@ -25,13 +20,18 @@
 <script setup>
 import ComicScrollPanel from "../components/ComicScrollPanel.vue";
 
+const props = defineProps({
+  title: {
+    type: String,
+    required: true
+  }
+});
 </script>
+
 <style scoped>
 .outer-container {
   max-width: 100%;
   min-height: 100vh;
-  margin: 20px auto;
-  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -39,7 +39,6 @@ import ComicScrollPanel from "../components/ComicScrollPanel.vue";
   box-sizing: border-box;
   font-family: Arial, sans-serif;
 }
-
 
 .content-wrapper {
   display: flex;
@@ -54,7 +53,6 @@ import ComicScrollPanel from "../components/ComicScrollPanel.vue";
   min-width: 65vh;
   max-width: 65vh;
   height: auto;
-  padding: 15px;
   border-radius: 8px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
   text-align: left;
@@ -83,5 +81,27 @@ import ComicScrollPanel from "../components/ComicScrollPanel.vue";
   display: block;
 }
 
+@media (max-width: 768px) {
+  .content-wrapper {
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
 
+  .explanation-box {
+    max-width: 100%;
+    min-width: auto;
+    order: 1;
+  }
+
+  .content-wrapper > :last-child {
+    order: 2;
+    width: 100%;
+  }
+
+  .content-wrapper > :last-child {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+}
 </style>

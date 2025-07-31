@@ -31,18 +31,24 @@ const concepts = [
       'Entities, such as characters, props, and symbols,  are the visual anchors of each comic panel. They convey plot, emotion, and personality. Artists use body language, facial expressions, and spatial composition to highlight these elements. Understanding how entities are depicted and emphasized helps in decoding the scene and following the story’s emotional beats.'
   }
 ];
+
+const props = defineProps({
+  title: {
+    type: String,
+    required: true
+  }
+})
 </script>
 
 <template>
   <div class="container">
-    <h1>Comic Parts</h1>
-    <ImageExplanationViewer :images="concepts" />
+    <ImageExplanationViewer :images="concepts" :title="title" />
   </div>
 </template>
 
 <style scoped>
 .container {
-  padding: 2rem;
+  padding: 0rem;
   width: 100%;
   height: 100%;
   box-sizing: border-box;

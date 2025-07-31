@@ -22,11 +22,17 @@ const images = [
   }
 ];
 
+const props = defineProps({
+  title: {
+    type: String,
+    required: true
+  }
+})
+
 </script>
 
 <template>
   <div class="container">
-    <h1>Types of Graphic Novels</h1>
-    <ImageExplanationViewer :images="images" />
+    <ImageExplanationViewer :images="images" :title="title" />
   </div>
 </template>
