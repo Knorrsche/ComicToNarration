@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { detectionParams } from "../stores/detectionParams";
 import ComicImage from "../assets/Normal.jpg";
 
