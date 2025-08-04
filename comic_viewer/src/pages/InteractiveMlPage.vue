@@ -102,16 +102,17 @@ function perfect_setup() {
 }
 
 // Apply detection
+// Apply detection
 async function applyDetection() {
   loading.value = true;
   error.value = null;
   try {
     const formData = new FormData();
-    const imgResponse = await fetch(imageSrc.value);
-    const blob = await imgResponse.blob();
-    formData.append("file", blob, "upload.jpg");
 
-    // Always pull latest values directly from detectionParams
+    // Instead of sending the file, send comic and page names
+    formData.append("comic", "static");
+    formData.append("page", "AlleyOop.png"); // Adjust dynamically if needed
+
     formData.append("blur", detectionParams.blur);
     formData.append("threshold", detectionParams.threshold);
     formData.append("morph", detectionParams.morph);
@@ -136,6 +137,7 @@ async function applyDetection() {
     loading.value = false;
   }
 }
+
 
 // Reset image + parameters
 function resetImage() {

@@ -16,11 +16,15 @@
     <div class="content-wrapper">
       <div class="viewer-section" v-if="comic">
         <div v-if="imageSrc">
-          <div class="buttons">
-            <button :class="{ active: showPanels }" @click="showPanels = !showPanels" style="--active-color: #007bff">Panels</button>
-            <button :class="{ active: showBubbles }" @click="showBubbles = !showBubbles" style="--active-color: #dc3545">Speech Bubbles</button>
-            <button :class="{ active: showEntities }" @click="showEntities = !showEntities" style="--active-color: #28a745">Entities</button>
-          </div>
+<div class="buttons">
+  <button :class="{ active: showPanels }" @click="showPanels = !showPanels" style="--active-color: #007bff">Panels</button>
+  <button :class="{ active: showBubbles }" @click="showBubbles = !showBubbles" style="--active-color: #dc3545">Speech Bubbles</button>
+  <button :class="{ active: showEntities }" @click="showEntities = !showEntities" style="--active-color: #28a745">Entities</button>
+  <!-- New Apply Detection button -->
+  <button :disabled="loading" @click="applyDetection" style="--active-color: #ff9800">
+    {{ loading ? 'Processing...' : 'Apply Detection' }}
+  </button>
+</div>
 
           <!-- Image with Overlay Navigation -->
           <div class="image-wrapper image-viewer" ref="wrapperRef">
@@ -69,21 +73,21 @@ import { useRoute } from 'vue-router';
 import ComicScrollPanel from "../components/ComicScrollPanel.vue";
 import { detectionParams } from "../stores/detectionParams";
 
-import HeaderPage from './HeaderPage.vue'
-import InfoBoxPage from './InfoBoxPage.vue'
-import GraphicNovelDifferencePage from './GraphicNovelDifferencePage.vue'
-import ComicPartsPage from './ComicPartsPage.vue'
-import ChallengesPage from './ChallengesPage.vue'
+import Header from '../components/Header.vue'
+import InfoBox from '../components/InfoBox.vue'
+import GraphicNovelDifference from '../components/GraphicNovelDifference.vue'
+import ComicParts from '../components/ComicParts.vue'
+import Challenges from '../components/Challenges.vue'
 import InteractiveMlPage from './InteractiveMlPage.vue'
 import InteractiveDlPage from './InteractiveDlPage.vue'
 
 // Sidebar Menu Data
 const sections = [
-  { id: "header", title: "Intro", component: HeaderPage },
-  { id: "info", title: "The Visual Impaired", component: InfoBoxPage },
-  { id: "gn-diff", title: "Types of Graphic Novels", component: GraphicNovelDifferencePage },
-  { id: "parts", title: "Parts of Comics", component: ComicPartsPage },
-  { id: "challenges", title: "Challenges", component: ChallengesPage },
+  { id: "header", title: "Intro", component: Header },
+  { id: "info", title: "The Visual Impaired", component: InfoBox },
+  { id: "gn-diff", title: "Types of Graphic Novels", component: GraphicNovelDifference },
+  { id: "parts", title: "Parts of Comics", component: ComicParts },
+  { id: "challenges", title: "Challenges", component: Challenges },
   { id: "ml", title: "Machine Learning", component: InteractiveMlPage },
   { id: "dl", title: "Deep Learning", component: InteractiveDlPage }
 ]
@@ -118,6 +122,62 @@ const imageHeight = ref(0);
 const scaleX = ref(1);
 const scaleY = ref(1);
 
+
+
+const loading = ref(false);
+const detectionActive = ref(false);
+const processedImageSrc = ref(null);
+const originalImageSrc = ref('');
+
+async function applyDetection() {
+  if (!imageSrc.value) return;
+
+  // If detection is already active, turn it off and restore original
+  if (detectionActive.value) {
+    imageSrc.value = originalImageSrc.value; // revert
+    detectionActive.value = false;
+    return;
+  }
+
+  loading.value = true;
+  try {
+    const formData = new FormData();
+    formData.append("comic", comic.value);
+    formData.append("page", pages.value[pageIndex.value]);
+
+    // Append detection params from store
+    formData.append("blur", detectionParams.blur);
+    formData.append("threshold", detectionParams.threshold);
+    formData.append("morph", detectionParams.morph);
+    formData.append("min_size", detectionParams.minSize);
+    formData.append("bubble_thresh", detectionParams.bubbleThreshold);
+    formData.append("bubble_min_area", detectionParams.bubbleMin);
+    formData.append("bubble_max_area", detectionParams.bubbleMax);
+    formData.append("min_circularity", detectionParams.minCircularity);
+
+    // Call backend
+    const res = await fetch("http://localhost:8000/api/process", {
+      method: "POST",
+      body: formData
+    });
+
+    if (!res.ok) throw new Error(`Server error: ${res.statusText}`);
+
+    // Get processed image
+    const blobResult = await res.blob();
+    processedImageSrc.value = URL.createObjectURL(blobResult);
+
+    // Show processed image
+    imageSrc.value = processedImageSrc.value;
+    detectionActive.value = true;
+  } catch (err) {
+    console.error("Detection failed:", err);
+  } finally {
+    loading.value = false;
+  }
+}
+
+
 const fetchPages = async () => {
   const res = await fetch('http://localhost:8000/comics');
   const data = await res.json();
@@ -130,7 +190,9 @@ const fetchPages = async () => {
 
 const loadImage = async () => {
   const currentPage = pages.value[pageIndex.value];
-  imageSrc.value = `http://localhost:8000/comics/${comic.value}/${currentPage}`;
+  originalImageSrc.value = `http://localhost:8000/comics/${comic.value}/${currentPage}`;
+  imageSrc.value = originalImageSrc.value;
+  detectionActive.value = false;
   await fetchAnnotationXml();
 };
 
@@ -386,10 +448,10 @@ const boxStyle = (box) => ({
   border: 3px dashed blue;
 }
 .box-overlay.bubble {
-  border: 3px solid red;
+  border: 3px dashed red;
 }
 .box-overlay.entity {
-  border: 3px dotted green;
+  border: 3px dashed green;
 }
 
 /* Buttons Row */

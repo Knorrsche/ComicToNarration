@@ -57,7 +57,8 @@ def image_to_base64_np(array: np.ndarray) -> str:
 
 @app.post("/api/process")
 async def process_image(
-    file: UploadFile = File(...),
+    comic: str = Form(...),
+    page: str = Form(...),
     threshold: int = Form(200),
     blur: int = Form(5),
     morph: int = Form(5),
@@ -68,12 +69,18 @@ async def process_image(
     min_circularity: float = Form(0.4),
     use_adaptive: bool = Form(False)
 ):
-    contents = await file.read()
-    data = np.frombuffer(contents, dtype=np.uint8)
-    img = cv2.imdecode(data, cv2.IMREAD_COLOR)
+    # Build the full path to the image
+    img_path = os.path.join(DATA_DIR, comic, page)
+    if not os.path.exists(img_path):
+        return JSONResponse(status_code=404, content={"error": "Page not found"})
 
+    # Read image directly from disk
+    img = cv2.imread(img_path)
+    if img is None:
+        return JSONResponse(status_code=400, content={"error": "Invalid image"})
+
+    # Run detection
     panel_img = detect_panels(img, blur, threshold, morph, min_size)
-
     result_img = detect_speech_bubbles(
         panel_img,
         bubble_thresh=bubble_thresh,
@@ -84,11 +91,7 @@ async def process_image(
     )
 
     _, img_encoded = cv2.imencode('.png', result_img)
-
-    return StreamingResponse(
-        io.BytesIO(img_encoded.tobytes()),
-        media_type='image/png'
-    )
+    return StreamingResponse(io.BytesIO(img_encoded.tobytes()), media_type='image/png')
 
 
 @app.get("/comics")
@@ -98,6 +101,8 @@ def list_comics():
         return JSONResponse(status_code=500, content={"error": f"DATA_DIR not found: {DATA_DIR}"})
 
     for comic_name in os.listdir(DATA_DIR):
+        if comic_name == "static":
+            continue
         comic_path = os.path.join(DATA_DIR, comic_name)
         if not os.path.isdir(comic_path):
             continue

@@ -1,21 +1,21 @@
 <script setup>
 import { ref } from 'vue'
 
-import HeaderPage from './HeaderPage.vue'
-import InfoBoxPage from './InfoBoxPage.vue'
-import GraphicNovelDifferencePage from './GraphicNovelDifferencePage.vue'
-import ComicPartsPage from './ComicPartsPage.vue'
-import ChallengesPage from './ChallengesPage.vue'
+import Header from '../components/Header.vue'
+import InfoBox from '../components/InfoBox.vue'
+import GraphicNovelDifference from '../components/GraphicNovelDifference.vue'
+import ComicParts from '../components/ComicParts.vue'
+import Challenges from '../components/Challenges.vue'
 import InteractiveMlPage from './InteractiveMlPage.vue'
 import InteractiveDlPage from './InteractiveDlPage.vue'
 
 // Sections for menu
 const sections = [
-  { id: "header", title: "Intro", component: HeaderPage },
-  { id: "info", title: "Visual Impariment", component: InfoBoxPage },
-  { id: "gn-diff", title: "Graphic Novels", component: GraphicNovelDifferencePage },
-  { id: "parts", title: "Parts of Comics", component: ComicPartsPage },
-  { id: "challenges", title: "Challenges", component: ChallengesPage },
+  { id: "header", title: "Intro", component: Header },
+  { id: "info", title: "Visual Impariment", component: InfoBox },
+  { id: "gn-diff", title: "Graphic Novels", component: GraphicNovelDifference },
+  { id: "parts", title: "Parts of Comics", component: ComicParts },
+  { id: "challenges", title: "Challenges", component: Challenges },
   { id: "ml", title: "Machine Learning", component: InteractiveMlPage },
   { id: "dl", title: "Deep Learning", component: InteractiveDlPage }
 ]
