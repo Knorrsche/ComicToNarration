@@ -1,18 +1,25 @@
 <template>
   <div class="outer-container">
-    <h1>Deep Learning</h1>
+    <h1 class="section-title">Deep Learning</h1>
     <div class="content-wrapper">
       <div class="explanation-box">
         <h3>Deep Learning in Comics</h3>
         <p>
-          Deep learning is a subset of machine learning that uses layered neural networks (like CNNs or transformers) to automatically learn features from large datasets. Unlike traditional machine learning, which requires handcrafted features (e.g. edge detectors or geometric rules), deep learning models learn directly from raw pixel data — enabling them to identify complex patterns in comic images.
+          Deep learning is a subset of machine learning that uses layered neural networks
+          (like CNNs or transformers) to automatically learn features from large datasets.
+          Unlike traditional machine learning, which requires handcrafted features
+          (e.g. edge detectors or geometric rules), deep learning models learn directly from
+          raw pixel data — enabling them to identify complex patterns in comic images.
         </p>
         <p>
-          In the context of comics, deep learning allows automatic detection and interpretation of panels, speech bubbles, characters, and even emotions or narrative structure. This mimics how humans visually understand and follow stories, enabling smarter comic viewers and tools.
+          In the context of comics, deep learning allows automatic detection and interpretation
+          of panels, speech bubbles, characters, and even emotions or narrative structure.
+          This mimics how humans visually understand and follow stories, enabling smarter
+          comic viewers and tools.
         </p>
       </div>
 
-      <ComicScrollPanel></ComicScrollPanel>
+      <ComicScrollPanel />
     </div>
   </div>
 </template>
@@ -29,79 +36,78 @@ const props = defineProps({
 </script>
 
 <style scoped>
+:root {
+  --orange: #da7434;
+  --orange-hover: #c45d1f;
+  --bg-blur: rgba(255, 255, 255, 0.75);
+}
+
 .outer-container {
   max-width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  gap: 2rem;
+  padding: 2rem;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: "Inter", "Segoe UI", Tahoma, sans-serif;
+}
+
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: bold;
+  text-align: center;
+  color: var(--orange);
 }
 
 .content-wrapper {
   display: flex;
   width: 100%;
-  gap: 40px;
+  gap: 2rem;
   justify-content: center;
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 
+/* Glassmorphism Explanation Box */
 .explanation-box {
   flex: 1 1 50%;
-  min-width: 65vh;
-  max-width: 65vh;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-  text-align: left;
-  user-select: none;
+  min-width: 300px;
+  max-width: 650px;
+  padding: 2rem;
+  background: var(--bg-blur);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
   color: #333;
-  font-weight: 600;
+  font-weight: 500;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 1rem;
+}
+
+.explanation-box h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--orange);
 }
 
 .explanation-box p {
   font-size: 1rem;
   color: #555;
-  line-height: 1.4;
-  margin-bottom: 10px;
+  line-height: 1.6;
 }
 
-.image-wrapper img {
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  border-radius: 6px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
-  user-select: none;
-  display: block;
-}
-
+/* Mobile Layout */
 @media (max-width: 768px) {
   .content-wrapper {
     flex-direction: column;
-    gap: 20px;
     align-items: center;
   }
 
   .explanation-box {
-    max-width: 100%;
-    min-width: auto;
-    order: 1;
-  }
-
-  .content-wrapper > :last-child {
-    order: 2;
     width: 100%;
-  }
-
-  .content-wrapper > :last-child {
-    max-height: 60vh;
-    overflow-y: auto;
+    padding: 1.5rem;
   }
 }
 </style>

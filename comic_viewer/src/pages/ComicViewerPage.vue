@@ -1,7 +1,11 @@
 <template>
   <div class="layout">
-    <!-- Hamburger Menu -->
-    <button class="hamburger" @click="toggleMenu" aria-label="Toggle Menu">☰</button>
+    <!-- Modern Hamburger Menu -->
+    <button class="hamburger" @click="toggleMenu" aria-label="Toggle Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
 
     <!-- Sidebar -->
     <nav class="sidebar" :class="{ open: isMenuOpen }">
@@ -12,25 +16,32 @@
       </ul>
     </nav>
 
-    <!-- Main Viewer Content -->
+    <!-- Main Content -->
     <div class="content-wrapper">
+      <!-- Viewer Section -->
       <div class="viewer-section" v-if="comic">
         <div v-if="imageSrc">
-<div class="buttons">
-  <button :class="{ active: showPanels }" @click="showPanels = !showPanels" style="--active-color: #007bff">Panels</button>
-  <button :class="{ active: showBubbles }" @click="showBubbles = !showBubbles" style="--active-color: #dc3545">Speech Bubbles</button>
-  <button :class="{ active: showEntities }" @click="showEntities = !showEntities" style="--active-color: #28a745">Entities</button>
-  <!-- New Apply Detection button -->
-  <button :disabled="loading" @click="applyDetection" style="--active-color: #ff9800">
-    {{ loading ? 'Processing...' : 'Apply Detection' }}
-  </button>
-</div>
+          <!-- Controls -->
+          <div class="buttons">
+            <button :class="{ active: showPanels }" @click="showPanels = !showPanels" style="--active-color: #007bff">
+              Panels
+            </button>
+            <button :class="{ active: showBubbles }" @click="showBubbles = !showBubbles" style="--active-color: #dc3545">
+              Speech Bubbles
+            </button>
+            <button :class="{ active: showEntities }" @click="showEntities = !showEntities" style="--active-color: #28a745">
+              Entities
+            </button>
+            <button :disabled="loading" @click="applyDetection" style="--active-color: #ff9800">
+              {{ loading ? 'Processing...' : detectionActive ? 'Remove Detection' : 'Apply Detection' }}
+            </button>
+          </div>
 
-          <!-- Image with Overlay Navigation -->
-          <div class="image-wrapper image-viewer" ref="wrapperRef">
-            <img :src="imageSrc" @load="onImageLoad" ref="imageRef" alt="Processed comic" class="responsive-image" />
+          <!-- Image Viewer -->
+          <div class="image-viewer" ref="wrapperRef">
+            <img :src="imageSrc" @load="onImageLoad" ref="imageRef" alt="Processed comic" class="comic-image" />
 
-            <!-- Overlay Nav Buttons -->
+            <!-- Navigation Buttons -->
             <button
               class="image-nav-btn left"
               @click="prevPage"
@@ -48,7 +59,7 @@
               ▶
             </button>
 
-            <!-- Bounding Boxes without labels -->
+            <!-- Bounding Boxes -->
             <div
               v-for="(box, index) in filteredBoundingBoxes"
               :key="index"
@@ -59,7 +70,7 @@
         </div>
       </div>
 
-      <!-- Only show ComicScrollPanel if NOT on mobile -->
+      <!-- Comic List (hidden on mobile) -->
       <div class="scroller-section" v-if="!isMobile">
         <ComicScrollPanel />
       </div>
@@ -81,7 +92,7 @@ import Challenges from '../components/Challenges.vue'
 import InteractiveMlPage from './InteractiveMlPage.vue'
 import InteractiveDlPage from './InteractiveDlPage.vue'
 
-// Sidebar Menu Data
+// Sidebar Menu
 const sections = [
   { id: "header", title: "Intro", component: Header },
   { id: "info", title: "The Visual Impaired", component: InfoBox },
@@ -103,7 +114,7 @@ const checkMobile = () => {
   isMobile.value = window.innerWidth <= 768;
 };
 
-// Viewer Logic
+// Viewer logic
 const route = useRoute();
 const comic = ref(route.params.comic);
 const pages = ref([]);
@@ -122,19 +133,17 @@ const imageHeight = ref(0);
 const scaleX = ref(1);
 const scaleY = ref(1);
 
-
-
 const loading = ref(false);
 const detectionActive = ref(false);
 const processedImageSrc = ref(null);
 const originalImageSrc = ref('');
 
+// Apply detection
 async function applyDetection() {
   if (!imageSrc.value) return;
 
-  // If detection is already active, turn it off and restore original
   if (detectionActive.value) {
-    imageSrc.value = originalImageSrc.value; // revert
+    imageSrc.value = originalImageSrc.value;
     detectionActive.value = false;
     return;
   }
@@ -144,8 +153,6 @@ async function applyDetection() {
     const formData = new FormData();
     formData.append("comic", comic.value);
     formData.append("page", pages.value[pageIndex.value]);
-
-    // Append detection params from store
     formData.append("blur", detectionParams.blur);
     formData.append("threshold", detectionParams.threshold);
     formData.append("morph", detectionParams.morph);
@@ -155,7 +162,6 @@ async function applyDetection() {
     formData.append("bubble_max_area", detectionParams.bubbleMax);
     formData.append("min_circularity", detectionParams.minCircularity);
 
-    // Call backend
     const res = await fetch("http://localhost:8000/api/process", {
       method: "POST",
       body: formData
@@ -163,11 +169,8 @@ async function applyDetection() {
 
     if (!res.ok) throw new Error(`Server error: ${res.statusText}`);
 
-    // Get processed image
     const blobResult = await res.blob();
     processedImageSrc.value = URL.createObjectURL(blobResult);
-
-    // Show processed image
     imageSrc.value = processedImageSrc.value;
     detectionActive.value = true;
   } catch (err) {
@@ -177,7 +180,7 @@ async function applyDetection() {
   }
 }
 
-
+// Fetch pages
 const fetchPages = async () => {
   const res = await fetch('http://localhost:8000/comics');
   const data = await res.json();
@@ -203,7 +206,6 @@ const fetchAnnotationXml = async () => {
 
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(text, "application/xml");
-
     boundingBoxes.value = extractBoxesFromXml(xmlDoc, pageIndex.value + 1);
 
     await nextTick();
@@ -246,6 +248,7 @@ watch(() => route.params.comic, (newVal) => {
   fetchPages();
 });
 
+// Filter boxes
 const filteredBoundingBoxes = computed(() =>
   boundingBoxes.value.filter((box) => {
     if (box.type === "panel" && !showPanels.value) return false;
@@ -261,22 +264,15 @@ const parseBoundingBox = (bboxString) => {
     acc[key] = parseFloat(value);
     return acc;
   }, {});
-  return {
-    x: parts.x || 0,
-    y: parts.y || 0,
-    width: parts.width || 0,
-    height: parts.height || 0,
-  };
+  return { x: parts.x || 0, y: parts.y || 0, width: parts.width || 0, height: parts.height || 0 };
 };
 
 const extractBoxesFromXml = (xmlDoc, currentPageIndex) => {
   const boxes = [];
   const pageNodes = xmlDoc.getElementsByTagName("Page");
-
   for (const pageNode of pageNodes) {
     const indexNode = pageNode.getElementsByTagName("Index")[0];
     if (!indexNode) continue;
-
     const index = parseInt(indexNode.textContent);
     if (index !== currentPageIndex) continue;
 
@@ -295,7 +291,6 @@ const extractBoxesFromXml = (xmlDoc, currentPageIndex) => {
     collect("SpeechBubble", "bubble");
     collect("Entity", "entity");
   }
-
   return boxes;
 };
 
@@ -303,8 +298,12 @@ const updateScale = () => {
   const img = imageRef.value;
   if (!img || img.naturalWidth === 0) return;
 
-  imageWidth.value = img.clientWidth;
-  imageHeight.value = img.clientHeight;
+  const rect = img.getBoundingClientRect();
+  const containerRect = wrapperRef.value.getBoundingClientRect();
+
+  // Scale based on actual rendered image dimensions
+  imageWidth.value = rect.width;
+  imageHeight.value = rect.height;
 
   scaleX.value = imageWidth.value / img.naturalWidth;
   scaleY.value = imageHeight.value / img.naturalHeight;
@@ -324,36 +323,60 @@ const boxStyle = (box) => ({
 </script>
 
 <style scoped>
+:root {
+  --orange: #da7434;
+  --orange-hover: #c45d1f;
+}
+
+/* Layout */
 .layout {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
+/* Modern Hamburger */
 .hamburger {
   position: fixed;
   top: 1rem;
   left: 1rem;
   z-index: 1100;
-  font-size: 1.5rem;
-  background: rgba(218, 116, 52, 0.95);
-  color: white;
-  border: none;
-  padding: 0.5rem 0.7rem;
-  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 34px;
+  height: 26px;
+  background: white;
+  border: 2px solid var(--orange);
+  border-radius: 8px;
+  padding: 6px;
   cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.hamburger:hover {
+  background: #fff4ee;
+  transform: scale(1.05);
+}
+.hamburger span {
+  display: block;
+  height: 3px;
+  background: var(--orange);
+  border-radius: 2px;
 }
 
+/* Sidebar with glass effect */
 .sidebar {
   position: fixed;
   top: 0;
   left: -250px;
   height: 100vh;
   width: 250px;
-  background-color: #da7434;
-  padding-top: 2rem;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  padding-top: 4rem;
   z-index: 1000;
   transition: left 0.3s ease;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.15);
 }
 .sidebar.open {
   left: 0;
@@ -364,29 +387,28 @@ const boxStyle = (box) => ({
   margin: 0;
 }
 .sidebar li {
-  margin: 1.5rem 0;
+  margin: 1.2rem 0;
   text-align: center;
 }
 .sidebar a {
-  color: white;
+  color: var(--orange);
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
   transition: color 0.3s ease;
-  display: block;
-  padding: 0.5rem 0;
 }
-.sidebar a:hover,
-.sidebar a.active {
-  color: #00bfff;
+.sidebar a:hover {
+  color: var(--orange-hover);
 }
 
+/* Content layout */
 .content-wrapper {
   display: flex;
   width: 100%;
-  gap: 40px;
+  gap: 2rem;
   justify-content: center;
   align-items: flex-start;
   flex-wrap: wrap;
+  padding: 2rem;
 }
 
 .viewer-section {
@@ -396,21 +418,22 @@ const boxStyle = (box) => ({
   max-width: 65vw;
 }
 
-.scroller-section {
-  width: 100%;
-}
-
-.image-wrapper {
+/* Glass style image viewer */
+.image-viewer {
   position: relative;
   width: 100%;
   max-width: 600px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  overflow: hidden; /* ensures overlays align */
 }
 
-.image-viewer img {
+.comic-image {
   max-width: 100%;
   max-height: 80vh;
-  border-radius: 8px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
 }
 
 /* Overlay Nav Buttons */
@@ -418,13 +441,23 @@ const boxStyle = (box) => ({
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--orange);
   color: white;
-  font-size: 2rem;
+  font-size: 1.8rem;
   padding: 0.5rem 0.8rem;
   border: none;
   border-radius: 50%;
   cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+}
+.image-nav-btn:hover {
+  background: var(--orange-hover);
+  transform: translateY(-50%) scale(1.05);
+}
+.image-nav-btn:disabled {
+  background: rgba(0,0,0,0.2);
+  cursor: default;
 }
 .image-nav-btn.left {
   left: 10px;
@@ -432,53 +465,62 @@ const boxStyle = (box) => ({
 .image-nav-btn.right {
   right: 10px;
 }
-.image-nav-btn:hover {
-  background: rgba(0, 0, 0, 0.6);
-}
-.image-nav-btn:disabled {
-  background: rgba(0, 0, 0, 0.2);
-}
 
-/* Bounding Boxes */
+/* Bounding boxes with glow */
 .box-overlay {
   pointer-events: none;
   position: absolute;
+  border-radius: 4px;
 }
 .box-overlay.panel {
-  border: 3px dashed blue;
+  border: 3px solid rgba(0, 123, 255, 0.7);
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.6);
 }
 .box-overlay.bubble {
-  border: 3px dashed red;
+  border: 3px solid rgba(220, 53, 69, 0.7);
+  box-shadow: 0 0 6px rgba(220, 53, 69, 0.6);
 }
 .box-overlay.entity {
-  border: 3px dashed green;
+  border: 3px solid rgba(40, 167, 69, 0.7);
+  box-shadow: 0 0 6px rgba(40, 167, 69, 0.6);
 }
 
-/* Buttons Row */
+/* Control buttons */
 .buttons {
   margin-bottom: 15px;
   display: flex;
   justify-content: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
-
+.buttons button {
+  padding: 0.5rem 0.8rem;
+  border: none;
+  border-radius: 20px;
+  background: #f0f0f0;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.buttons button:hover {
+  background: #e2e2e2;
+}
 button.active {
   background-color: var(--active-color);
   color: white;
 }
 
-/* Mobile Layout */
+/* Mobile layout */
 @media (max-width: 768px) {
   .content-wrapper {
     flex-direction: column;
     gap: 20px;
+    padding: 1rem;
   }
-
   .viewer-section {
     max-width: 100%;
   }
-
-  .image-viewer img {
+  .comic-image {
     max-height: 60vh;
   }
 }

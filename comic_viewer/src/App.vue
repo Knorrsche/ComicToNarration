@@ -1,18 +1,34 @@
-<!-- src/App.vue -->
 <template>
-  <!-- This will display whatever page the router says -->
   <router-view />
 </template>
 
 <script setup>
-// Nothing special here — all routing logic is in router.js
 </script>
 
 <style>
-/* Keep global styles here if you want */
-body, html {
+* {
+  box-sizing: border-box;
+}
+
+html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+  scroll-behavior: smooth;
+  font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-color: #fafafa;
+  color: #222;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 </style>

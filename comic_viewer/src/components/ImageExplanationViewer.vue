@@ -10,14 +10,13 @@ const props = defineProps({
 
 const currentIndex = ref(0);
 const displayTitle = ref(props.title);
+const slideDirection = ref('next'); // 'next' or 'prev'
 
 onMounted(() => {
   if (!displayTitle.value) {
-    // get the section id from the closest parent section in DOM
     const sectionEl = document.querySelector('section:has(.viewer-wrapper)');
     const id = sectionEl?.id;
     if (id) {
-      // Map section ids to titles here
       const sectionTitles = {
         header: "Intro",
         info: "The Visual Impaired",
@@ -32,213 +31,224 @@ onMounted(() => {
   }
 });
 
-const prevImage = () => { if (currentIndex.value > 0) currentIndex.value--; };
-const nextImage = () => { if (currentIndex.value < props.images.length - 1) currentIndex.value++; };
+const prevImage = () => {
+  if (currentIndex.value > 0) {
+    slideDirection.value = 'prev';
+    currentIndex.value--;
+  }
+};
+const nextImage = () => {
+  if (currentIndex.value < props.images.length - 1) {
+    slideDirection.value = 'next';
+    currentIndex.value++;
+  }
+};
 </script>
 
 <template>
   <div v-if="images.length" class="viewer-wrapper">
-    <!-- Section Title -->
-    <header class="viewer-title" v-if="title">
+    <!-- Middle Title -->
+    <header class="viewer-title">
       {{ title }}
     </header>
 
-    <div class="viewer">
-      <!-- Explanation -->
-      <div class="explanation-box">
-        <h3>{{ images[currentIndex]?.label || "Explanation" }}</h3>
-        <p>{{ explanations[currentIndex] || images[currentIndex]?.explanation || "No explanation available." }}</p>
-      </div>
+    <!-- Navigation Buttons -->
+    <button
+      class="nav-btn left"
+      @click="prevImage"
+      :disabled="currentIndex === 0"
+      aria-label="Previous"
+    >
+      ◀
+    </button>
 
-      <!-- Image -->
-      <div class="image-viewer">
-        <div class="image-container">
-          <img
-            :src="useBase64 ? images[currentIndex].base64 : images[currentIndex].src"
-            :alt="images[currentIndex].label"
-            loading="lazy"
-          />
-          <button
-            class="image-nav-btn left"
-            @click="prevImage"
-            :disabled="currentIndex === 0"
-            aria-label="Previous Image"
-          >
-            ◀
-          </button>
-          <button
-            class="image-nav-btn right"
-            @click="nextImage"
-            :disabled="currentIndex === images.length - 1"
-            aria-label="Next Image"
-          >
-            ▶
-          </button>
+    <button
+      class="nav-btn right"
+      @click="nextImage"
+      :disabled="currentIndex === images.length - 1"
+      aria-label="Next"
+    >
+      ▶
+    </button>
+
+    <!-- Viewer Content with transition -->
+    <transition :name="slideDirection === 'next' ? 'slide-next' : 'slide-prev'" mode="out-in">
+      <div :key="currentIndex" class="viewer">
+        <!-- Explanation -->
+        <div class="explanation-box">
+          <h3>{{ images[currentIndex]?.label || "Explanation" }}</h3>
+          <p>{{ explanations[currentIndex] || images[currentIndex]?.explanation || "No explanation available." }}</p>
+        </div>
+
+        <!-- Image -->
+        <div class="image-viewer">
+          <div class="image-container">
+            <img
+              :src="useBase64 ? images[currentIndex].base64 : images[currentIndex].src"
+              :alt="images[currentIndex].label"
+              loading="lazy"
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
 <style>
+:root {
+  --orange: #da7434;
+  --bg-light: #f9f9f9;
+  --text-dark: #222;
+}
+
 .viewer-wrapper {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
+  padding: 1rem;
+  align-items: center;
 }
 
 .viewer-title {
   font-size: clamp(1.5rem, 2vw, 2rem);
   font-weight: bold;
   text-align: center;
-  padding: 0.5rem 1rem;
-  background: rgba(218, 116, 52, 0.85);
+  padding: 0.6rem 1.2rem;
+  background: var(--orange);
   color: white;
-  border-radius: 8px;
-  margin-top: 3rem;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: fit-content;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
 }
 
+/* Viewer Layout */
 .viewer {
   display: flex;
-  height: 75vh;
-  width: 100%;
-  overflow: hidden;
+  height: 70vh;
+  width: 80%;
+  max-width: 1200px;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
 }
 
+/* Explanation Box */
 .explanation-box {
   width: 50%;
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
-  background: #f9f9f9;
-  border: 2px solid #ca2020;
+  justify-content: center;
+  padding: 2rem;
   overflow-y: auto;
 }
 
-.image-viewer {
-  position: relative;
-  width: 50%;
-  display: flex;
-  flex-direction: column;
-  border: 2px solid #ca2020;
+.explanation-box h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.8rem;
+  color: var(--orange);
 }
 
-.image-container {
-  flex: 1;
+.explanation-box p {
+  white-space: pre-line;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-dark);
+}
+
+/* Image Viewer */
+.image-viewer {
+  width: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
-  position: relative;
 }
 
 .image-container img {
-  max-width: 100%;
-  max-height: 100%;
+  width: 80%;
+  height: 80%;
+  max-width: 80%;
+  max-height: 80%;
   object-fit: contain;
+  border-radius: 12px;
 }
 
-.image-nav-btn {
+/* Navigation Buttons on full height sides */
+.nav-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--orange);
   color: white;
-  font-size: clamp(1.2rem, 2vw, 2rem);
-  padding: 0.5rem 0.8rem;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  padding: 0.6rem 1rem;
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  z-index: 10;
 }
 
-.image-nav-btn:hover {
-  background: rgba(0, 0, 0, 0.6);
+.nav-btn:hover {
+  background: #c45d1f;
+  transform: translateY(-50%) scale(1.05);
 }
 
-.image-nav-btn:disabled {
-  background: rgba(0, 0, 0, 0.2);
+.nav-btn:disabled {
+  background: rgba(0,0,0,0.2);
   cursor: default;
 }
 
-.image-nav-btn.left {
-  left: 10px;
+.nav-btn.left { left: 1rem; }
+.nav-btn.right { right: 1rem; }
+
+/* Slide Animations */
+.slide-next-enter-active, .slide-prev-enter-active,
+.slide-next-leave-active, .slide-prev-leave-active {
+  transition: all 0.4s ease;
 }
 
-.image-nav-btn.right {
-  right: 10px;
+.slide-next-enter-from {
+  opacity: 0;
+  transform: translateX(50px);
+}
+.slide-next-leave-to {
+  opacity: 0;
+  transform: translateX(-50px);
 }
 
-/* Mobile Layout Fix */
+.slide-prev-enter-from {
+  opacity: 0;
+  transform: translateX(-50px);
+}
+.slide-prev-leave-to {
+  opacity: 0;
+  transform: translateX(50px);
+}
+
+/* Mobile Layout */
 @media (max-width: 768px) {
   .viewer {
     flex-direction: column;
-    height: 100vh;
-    width: 100%; /* fix cut-off */
-    overflow-x: hidden;
-  }
-
-  .image-viewer {
-    order: -1;
-    width: 100%;
-    height: 33vh;
-    border: none; /* remove border */
-    padding: 0;
-    margin: 0;
-  }
-
-  .image-container {
-    width: 100%;
-    height: 100%;
-  }
-
-  .image-container img {
-    width: 100%;
     height: auto;
-    max-height: 100%;
-    object-fit: contain;
-    display: block; /* prevent overflow gaps */
+    width: 100%;
   }
 
   .explanation-box {
     width: 100%;
-    height: 67vh;
-    font-size: 0.9rem;
-    padding: 0;
-    margin: 0;
-    overflow-y: auto;
-    box-sizing: border-box;
+    padding: 1.2rem;
   }
 
-  .image-nav-btn {
-    font-size: clamp(1rem, 5vw, 1.8rem);
-    padding: 0.3rem 0.6rem;
+  .image-viewer {
+    width: 100%;
+    height: 40vh;
   }
 
-  .explanation-box h3 {
-    font-size: 1rem;
-    margin-bottom: 0.4rem;
-  }
-
-  .explanation-box p {
-    font-size: 0.85rem;
-    line-height: 1.3;
-  }
-}
-
-@media (max-width: 768px) {
-  .viewer-title {
-    font-size: 1.2rem;
-    padding: 0.4rem 0.8rem;
-    border-radius: 0;
-    background: rgba(218, 116, 52, 0.85);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
+  .nav-btn.left { left: 0.5rem; }
+  .nav-btn.right { right: 0.5rem; }
 }
 </style>

@@ -18,22 +18,27 @@
 
       <!-- Controls / Explanation -->
       <div class="explanation-box">
+        <!-- Tab Buttons -->
         <div class="tab-buttons">
           <button @click="activeTab = 'panel'" :class="{ active: activeTab === 'panel' }">Panel Parameters</button>
           <button @click="activeTab = 'bubble'" :class="{ active: activeTab === 'bubble' }">Bubble Parameters</button>
           <button @click="activeTab = 'text'" :class="{ active: activeTab === 'text' }">Text</button>
-          <button @click="perfect_setup">Perfect Setup</button>
+          <button class="secondary" @click="perfect_setup">Perfect Setup</button>
         </div>
 
-        <div v-if="activeTab === 'text'">
+        <!-- Text Tab -->
+        <div v-if="activeTab === 'text'" class="tab-content">
           <h3>Machine Learning in Comics</h3>
           <p>
             Deep learning is a subset of machine learning that uses layered neural networks
-            to automatically learn features from large datasets...
+            to automatically learn features from large datasets. In the context of comics,
+            these models can detect panels, speech bubbles, and even text regions to enhance
+            accessibility and automate processing.
           </p>
         </div>
 
-        <div v-else-if="activeTab === 'panel'">
+        <!-- Panel Parameters -->
+        <div v-else-if="activeTab === 'panel'" class="tab-content">
           <h3>Panel Detection Parameters</h3>
           <div class="param-group" v-for="param in panelParams" :key="param.label">
             <label>{{ param.label }}: {{ detectionParams[param.key] }}</label>
@@ -41,7 +46,8 @@
           </div>
         </div>
 
-        <div v-else-if="activeTab === 'bubble'">
+        <!-- Bubble Parameters -->
+        <div v-else-if="activeTab === 'bubble'" class="tab-content">
           <h3>Speech Bubble Detection Parameters</h3>
           <div class="param-group" v-for="param in bubbleParams" :key="param.label">
             <label>{{ param.label }}: {{ detectionParams[param.key] }}</label>
@@ -49,11 +55,13 @@
           </div>
         </div>
 
+        <!-- Action Buttons -->
         <div class="action-buttons">
-          <button :disabled="!imageSrc || loading" @click="applyDetection">Apply Detection</button>
-          <button :disabled="!imageSrc" @click="resetImage">Reset</button>
+          <button class="primary" :disabled="!imageSrc || loading" @click="applyDetection">Apply Detection</button>
+          <button class="secondary" :disabled="!imageSrc" @click="resetImage">Reset</button>
         </div>
 
+        <!-- Status -->
         <div v-if="loading" class="loading">Processing image, please wait...</div>
         <div v-if="error" class="error">{{ error }}</div>
       </div>
@@ -73,7 +81,7 @@ const error = ref(null);
 
 const activeTab = ref("text");
 
-// Panel parameters bound directly to store values
+// Panel parameters
 const panelParams = [
   { label: "Blur Kernel Size", key: "blur", attrs: { min: 1, max: 15, step: 2, type: "range" } },
   { label: "Threshold", key: "threshold", attrs: { min: 0, max: 255, type: "range" } },
@@ -81,7 +89,7 @@ const panelParams = [
   { label: "Min Panel Size", key: "minSize", attrs: { min: 10, max: 300, type: "range" } }
 ];
 
-// Bubble parameters bound directly to store values
+// Bubble parameters
 const bubbleParams = [
   { label: "Bubble Threshold", key: "bubbleThreshold", attrs: { min: 100, max: 255, type: "range" } },
   { label: "Min Circularity", key: "minCircularity", attrs: { min: 0.01, max: 1.0, step: 0.01, type: "range" } },
@@ -89,7 +97,6 @@ const bubbleParams = [
   { label: "Bubble Max Area", key: "bubbleMax", attrs: { min: 0.0001, max: 1.0, step: 0.0001, type: "range" } }
 ];
 
-// Set defaults
 function perfect_setup() {
   detectionParams.threshold = 100;
   detectionParams.blur = 5;
@@ -101,17 +108,13 @@ function perfect_setup() {
   detectionParams.minCircularity = 0.31;
 }
 
-// Apply detection
-// Apply detection
 async function applyDetection() {
   loading.value = true;
   error.value = null;
   try {
     const formData = new FormData();
-
-    // Instead of sending the file, send comic and page names
     formData.append("comic", "static");
-    formData.append("page", "AlleyOop.png"); // Adjust dynamically if needed
+    formData.append("page", "AlleyOop.png");
 
     formData.append("blur", detectionParams.blur);
     formData.append("threshold", detectionParams.threshold);
@@ -138,16 +141,20 @@ async function applyDetection() {
   }
 }
 
-
-// Reset image + parameters
 function resetImage() {
   processedImageSrc.value = null;
   error.value = null;
-  perfect_setup(); // Reset parameters too
+  perfect_setup();
 }
 </script>
 
 <style scoped>
+:root {
+  --orange: #da7434;
+  --orange-hover: #c45d1f;
+  --bg-blur: rgba(255, 255, 255, 0.75);
+}
+
 .viewer-wrapper {
   display: flex;
   flex-direction: column;
@@ -159,26 +166,29 @@ function resetImage() {
   font-weight: bold;
   text-align: center;
   padding: 0.5rem 1rem;
-  background: rgba(218, 116, 52, 0.85);
+  background: var(--orange);
   color: white;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-top: 1rem;
-  max-width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
 }
 
 .viewer {
   display: flex;
   height: 75vh;
   width: 100%;
+  gap: 1rem;
 }
 
 .image-viewer {
   width: 50%;
   display: flex;
   flex-direction: column;
-  border: 2px solid #ca2020;
+  background: var(--bg-blur);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
 .image-container {
@@ -189,35 +199,40 @@ function resetImage() {
 }
 
 .image-container img {
-  max-width: 100%;
-  max-height: 100%;
+  width: 80%;
+  height: 80%;
   object-fit: contain;
+  border-radius: 12px;
 }
 
 .explanation-box {
   width: 50%;
-  padding: 1rem;
-  background: #f9f9f9;
+  padding: 1.2rem;
+  background: var(--bg-blur);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .tab-buttons {
   display: flex;
-  justify-content: space-between;
-  flex-wrap: nowrap;
-  gap: 4px;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 .tab-buttons button {
-  flex: 1 1 auto;
-  font-size: clamp(0.6rem, 1.5vw, 0.9rem);
-  padding: 0.3rem 0.4rem;
-  white-space: nowrap;
-  border-radius: 4px;
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 6px;
   background: #ddd;
-  border: 1px solid #ccc;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
 }
 
 .tab-buttons button:hover {
@@ -225,12 +240,33 @@ function resetImage() {
 }
 
 .tab-buttons button.active {
-  background: #007bff;
+  background: var(--orange);
+  color: white;
+}
+
+.tab-buttons button.secondary {
+  background: white;
+  border: 1px solid var(--orange);
+  color: var(--orange);
+}
+
+.tab-buttons button.secondary:hover {
+  background: var(--orange-hover);
   color: white;
 }
 
 .param-group {
   margin-top: 0.5rem;
+}
+
+.param-group label {
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.param-group input {
+  width: 100%;
 }
 
 .action-buttons {
@@ -239,28 +275,57 @@ function resetImage() {
   margin-top: 1rem;
 }
 
+button.primary {
+  background: var(--orange);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+button.primary:hover {
+  background: var(--orange-hover);
+}
+
+button.secondary {
+  background: white;
+  border: 1px solid var(--orange);
+  color: var(--orange);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button.secondary:hover {
+  background: var(--orange-hover);
+  color: white;
+}
+
 .loading {
-  color: #007bff;
+  color: var(--orange);
+  margin-top: 0.5rem;
 }
 
 .error {
   color: red;
+  margin-top: 0.5rem;
 }
 
 @media (max-width: 768px) {
   .viewer {
     flex-direction: column;
-    height: 100vh;
+    height: auto;
   }
   .image-viewer {
     width: 100%;
-    height: 33%;
+    height: 40vh;
   }
   .explanation-box {
     width: 100%;
-    height: 67%;
-    font-size: clamp(0.8rem, 2vw, 1rem);
-    overflow-y: auto;
+    height: auto;
   }
 }
 </style>

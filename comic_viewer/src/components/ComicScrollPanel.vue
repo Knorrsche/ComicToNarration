@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import {nextTick, onMounted, ref} from "vue";
+import { nextTick, onMounted, ref } from "vue";
 
 const router = useRouter();
 
@@ -25,7 +25,6 @@ const selectPage = (page) => {
 
 const loadPage = async (comicName, pageFilename) => {
   try {
-    loading.value = true;
     const response = await fetch(
       `http://localhost:8000/comic-page?comic=${encodeURIComponent(comicName)}&page=${encodeURIComponent(pageFilename)}`
     );
@@ -42,8 +41,6 @@ const loadPage = async (comicName, pageFilename) => {
     updateScale();
   } catch (err) {
     console.error("Error loading page:", err);
-  } finally {
-    loading.value = false;
   }
 };
 
@@ -51,69 +48,109 @@ onMounted(async () => {
   try {
     const res = await fetch("http://localhost:8000/comics");
     if (!res.ok) throw new Error("Failed to fetch comics");
-    const comics = await res.json();
-    comicList.value = comics;
+    comicList.value = await res.json();
   } catch (err) {
     console.error("Error loading comic list:", err);
   }
 
   window.addEventListener("resize", updateScale);
 });
-
 </script>
 
 <template>
-<div class="comic-scroll-panel">
-  <h3>Select a Comic</h3>
-  <div class="scroll-container">
-  <div
-    v-for="(comic, index) in comicList"
-    :key="index"
-    class="comic-item-with-preview"
-    @click="goToViewer(comic.name)"
-  >
-<img :src="`http://localhost:8000/comics/${comic.name}/${comic.pages[0]}`"
-     alt="preview"
-     class="comic-thumbnail" />
+  <div class="comic-scroll-panel">
+    <h3 class="panel-title">Select a Comic</h3>
+    <div class="scroll-container">
+      <div
+        v-for="(comic, index) in comicList"
+        :key="index"
+        class="comic-card"
+        @click="goToViewer(comic.name)"
+      >
+        <img
+          :src="`http://localhost:8000/comics/${comic.name}/${comic.pages[0]}`"
+          alt="preview"
+          class="comic-thumbnail"
+        />
+        <div class="comic-name">{{ comic.name }}</div>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <style scoped>
+:root {
+  --orange: #da7434;
+  --orange-hover: #c45d1f;
+}
+
+.comic-scroll-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.panel-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--orange);
+  margin-bottom: 0.5rem;
+}
+
 .scroll-container {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  overflow-x: hidden;
   max-height: 65vh;
-  width:350px;
-  gap: 12px;
-  padding-right: 4px;
+  gap: 14px;
+  padding-right: 6px;
 }
 
-.comic-item-with-preview {
-  flex: 0 0 auto;
-  width: 100px;
-  text-align: center;
+/* Custom scrollbar */
+.scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: rgba(218, 116, 52, 0.5);
+  border-radius: 4px;
+}
+.scroll-container::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.comic-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  overflow: hidden;
   cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.comic-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 
 .comic-thumbnail {
-  width: 300px;
+  width: 100%;
   height: 420px;
   object-fit: cover;
-  border-radius: 4px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
-  margin-bottom: 6px;
+  display: block;
 }
 
 .comic-name {
+  padding: 0.5rem;
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: #333;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-align: center;
+  background: #fafafa;
+}
+
+@media (max-width: 768px) {
+  .comic-thumbnail {
+    height: 300px;
+  }
 }
 </style>

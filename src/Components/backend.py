@@ -9,7 +9,7 @@ import numpy as np
 from PIL import Image
 import io
 import base64
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
