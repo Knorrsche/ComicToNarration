@@ -1,25 +1,44 @@
 <template>
-  <div class="outer-container">
-    <h1 class="section-title">Deep Learning</h1>
-    <div class="content-wrapper">
+  <div class="viewer-wrapper">
+    <!-- Title -->
+    <header class="viewer-title">
+      {{ title }}
+    </header>
+
+    <!-- Main Content -->
+    <div class="viewer">
+      <!-- Explanation -->
       <div class="explanation-box">
         <h3>Deep Learning in Comics</h3>
         <p>
-          Deep learning is a subset of machine learning that uses layered neural networks
-          (like CNNs or transformers) to automatically learn features from large datasets.
-          Unlike traditional machine learning, which requires handcrafted features
-          (e.g. edge detectors or geometric rules), deep learning models learn directly from
-          raw pixel data — enabling them to identify complex patterns in comic images.
+          Deep learning is a branch of artificial intelligence that uses multi-layered
+          neural networks, such as convolutional neural networks (CNNs) or transformers,
+          to automatically discover visual patterns from raw data. Instead of relying on
+          hand-tuned rules like edge detectors or geometric shape finders, these models
+          learn directly from pixel values, building their own understanding of what
+          panels, speech bubbles, or characters look like.
         </p>
         <p>
-          In the context of comics, deep learning allows automatic detection and interpretation
-          of panels, speech bubbles, characters, and even emotions or narrative structure.
-          This mimics how humans visually understand and follow stories, enabling smarter
-          comic viewers and tools.
+          In comics, this means deep learning can detect and classify panels, identify
+          speech bubbles, track characters, and even infer emotions or scene context.
+          Because the models learn from large and diverse datasets, they are far more
+          adaptable to different art styles, unconventional layouts, and creative designs
+          than traditional rule-based methods.
+        </p>
+        <p>
+          You can explore this in action with the interactive viewer, adjust parameters,
+          apply detection, and compare results to see how automated understanding of
+          comics can be both powerful and flexible in capturing the richness of the medium.
+          You can also compare the outputs of this deep learning model with the rule-based
+          detections you configured in the previous section to better understand the strengths
+          and limitations of each approach.
         </p>
       </div>
 
-      <ComicScrollPanel />
+      <!-- Comic Panel List -->
+      <div class="image-viewer">
+        <ComicScrollPanel />
+      </div>
     </div>
   </div>
 </template>
@@ -38,76 +57,136 @@ const props = defineProps({
 <style scoped>
 :root {
   --orange: #da7434;
-  --orange-hover: #c45d1f;
-  --bg-blur: rgba(255, 255, 255, 0.75);
+  --orange-light: #e28752;
+  --bg-light: #f9f9f9;
+  --text-dark: #222;
 }
 
-.outer-container {
-  max-width: 100%;
-  min-height: 100vh;
+/* Wrapper matches viewer component */
+.viewer-wrapper {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 2rem;
-  box-sizing: border-box;
-  font-family: "Inter", "Segoe UI", Tahoma, sans-serif;
+  gap: 1.5rem;
+  padding: 1rem;
+  align-items: center;
 }
 
-.section-title {
-  font-size: clamp(1.8rem, 4vw, 2.4rem);
-  font-weight: bold;
+/* Gradient Title Bar */
+.viewer-title {
+  font-size: clamp(1.6rem, 2.2vw, 2.2rem);
+  font-weight: 700;
   text-align: center;
-  color: var(--orange);
+  padding: 0.7rem 1.5rem;
+  background: linear-gradient(135deg, var(--orange), var(--orange-light));
+  color: white;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(218, 116, 52, 0.55), inset 0 2px 6px rgba(255, 255, 255, 0.15);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  position: relative;
+}
+.viewer-title::after {
+  content: "";
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 2px;
 }
 
-.content-wrapper {
+/* Main Glassmorphic Container */
+.viewer {
   display: flex;
-  width: 100%;
-  gap: 2rem;
-  justify-content: center;
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-
-/* Glassmorphism Explanation Box */
-.explanation-box {
-  flex: 1 1 50%;
-  min-width: 300px;
-  max-width: 650px;
-  padding: 2rem;
-  background: var(--bg-blur);
+  width: 80%;
+  max-width: 1200px;
+  gap: 1rem;
+  background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(249,249,249,0.6));
   backdrop-filter: blur(12px);
   border-radius: 16px;
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
-  color: #333;
-  font-weight: 500;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.12);
+  padding: 1rem;
+  align-items: stretch;
+  max-height: 75vh;
+}
+
+/* Explanation Box */
+.explanation-box {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  justify-content: center;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* Orange scrollbar for explanation box */
+.explanation-box::-webkit-scrollbar {
+  width: 8px;
+}
+.explanation-box::-webkit-scrollbar-thumb {
+  background-color: var(--orange);
+  border-radius: 4px;
+}
+.explanation-box::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .explanation-box h3 {
-  font-size: 1.4rem;
-  font-weight: 600;
+  font-size: 1.3rem;
+  margin-bottom: 0.8rem;
   color: var(--orange);
 }
-
 .explanation-box p {
   font-size: 1rem;
-  color: #555;
   line-height: 1.6;
+  color: var(--text-dark);
+}
+
+/* Comic Scroll Panel Wrapper */
+.image-viewer {
+  flex: 1;
+  display: flex;
+  flex-direction: column; /* stack vertically */
+  align-items: flex-start; /* align to top */
+  justify-content: flex-start;
+  overflow-y: auto;
+  max-height: 100%;
+  padding-top: 0.5rem; /* ensure top content visible */
+}
+
+/* Orange scrollbar for comic list */
+.image-viewer::-webkit-scrollbar {
+  width: 8px;
+}
+.image-viewer::-webkit-scrollbar-thumb {
+  background-color: var(--orange);
+  border-radius: 4px;
+}
+.image-viewer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Ensure Select Comic text inside ComicScrollPanel is fully visible */
+.image-viewer :deep(select) {
+  max-width: 100%;
+  white-space: normal;
 }
 
 /* Mobile Layout */
 @media (max-width: 768px) {
-  .content-wrapper {
+  .viewer {
     flex-direction: column;
-    align-items: center;
-  }
-
-  .explanation-box {
     width: 100%;
-    padding: 1.5rem;
+    max-width: 95%;
+    max-height: none;
+  }
+  .image-viewer {
+    order: -1;
+    max-height: none;
   }
 }
 </style>

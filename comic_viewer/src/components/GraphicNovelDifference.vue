@@ -4,24 +4,6 @@ import example2 from '../assets/vagabond.jpg';
 import example3 from '../assets/Graphic_Novel.png';
 import ImageExplanationViewer from './ImageExplanationViewer.vue';
 
-const images = [
-  {
-    src: example1,
-    label: 'Western Comic',
-    explanation: 'This image shows a typical panel from a Western comic, characterized by colorful art, dynamic action scenes, and left-to-right text flow. Western comics often use bold line art, speech bubbles with dramatic fonts, and a clear panel sequence. They tend to emphasize superhero narratives, satire, or dramatic fiction. Marvel and DC Comics are well-known examples of this style, which has roots in American pulp magazines and Sunday newspaper strips.'
-  },
-  {
-    src: example2,
-    label: 'Japanese Manga',
-    explanation: 'This image depicts a panel from a Japanese manga, traditionally printed in black and white with a top-to-bottom, right-to-left reading order. Manga uses intricate line work, expressive facial features, and stylized sound effects. Genres are diverse, ranging from action (shōnen) to romance, slice-of-life, and psychological thrillers. Unlike Western comics, manga is often serialized in weekly or monthly magazines and places heavy emphasis on pacing and emotional nuance.'
-  },
-  {
-    src: example3,
-    label: 'Other Graphic Novels',
-    explanation: 'This image represents newer or alternative formats in graphic storytelling. These might include European bandes dessinées (e.g., Tintin, Asterix), webtoons designed for vertical scrolling, or indie graphic novels that experiment with layout, color, and themes. Unlike traditional comics, these works often aim for artistic expression, personal narratives, or political commentary. The format has grown to include hybrid styles and digital-first media, expanding the boundaries of visual literature.'
-  }
-];
-
 const props = defineProps({
   title: {
     type: String,
@@ -29,6 +11,26 @@ const props = defineProps({
   }
 })
 
+const images = [
+  {
+    label: "Western Comic",
+    explanation: `Western comics are a vibrant blend of dynamic action, bold colors, and dramatic storytelling. Pages are designed for left-to-right reading, with panels flowing in a clear, sequential order. Speech bubbles often feature strong, stylized fonts that match the energy of the scene, while bold line work and striking color palettes make every moment feel larger than life.
+    Traditionally rooted in superhero adventures, satire, and dramatic fiction, this style has deep ties to American pulp magazines and newspaper strips of the early 20th century. Iconic publishers like Marvel and DC have shaped the genre into a visual language of action and heroism, where every panel feels like a snapshot of epic storytelling.`,
+    src: example1
+  },
+  {
+    label: "Japanese Manga",
+    explanation: `Japanese manga offers a reading experience steeped in mood, pacing, and emotional nuance. Presented in black and white, it flows from right to left and top to bottom, immersing the reader in a rhythm unique to the medium. Line work ranges from delicate to intense, capturing everything from explosive battles to quiet, introspective moments.
+    Manga excels at expressive character design, with eyes, gestures, and panel framing often carrying as much weight as the dialogue. Genres are incredibly diverse,spanning action-packed shōnen adventures, heartfelt romance, contemplative slice-of-life, and thought-provoking psychological tales. Most manga begins as serialized chapters in weekly or monthly magazines, gradually building immersive worlds where storytelling and atmosphere intertwine.`,
+    src: example2
+  },
+  {
+    label: "Other Graphic Novels",
+    explanation: `Beyond the traditional realms of Western comics and manga lies a vast spectrum of graphic storytelling. This category embraces everything from European bandes dessinées, with their richly detailed art and adventurous spirit, to vertically scrolling webtoons designed for modern digital screens. Indie and experimental graphic novels push boundaries even further, playing with unconventional layouts, bold color theory, and themes ranging from deeply personal memoirs to political critique.
+    These works often prioritize artistic exploration and narrative experimentation over strict genre conventions. Whether printed on paper or crafted for a digital-first audience, they challenge the definition of a "comic," expanding the medium into new spaces where visuals and text merge into limitless forms of expression.`,
+    src: example3
+  }
+];
 </script>
 
 <template>

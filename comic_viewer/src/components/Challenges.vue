@@ -8,22 +8,20 @@ const challenges = [
   {
     src: entityMatch,
     label: 'Entity Matching',
-    explanation:
-      'Entity matching is the task of identifying and tracking the same character or object across multiple comic panels, even as their appearance shifts due to changes in perspective, pose, clothing, or expression. While humans use intuition and narrative context to resolve these variations, it poses a major hurdle for automated systems. Consistent entity recognition is crucial for maintaining narrative continuity and understanding character actions over time.'
+    explanation: `Entity matching is the art of recognizing the same character or object as they reappear throughout a comic, even when their look changes dramatically. Perspective shifts, new outfits, altered hairstyles, or varied facial expressions can all obscure identity. For human readers, narrative context and intuition fill in the gaps, but for automated systems, this is a demanding visual puzzle. Accurate entity recognition ensures narrative continuity, allowing the story’s threads, relationships, and actions to remain clear from panel to panel.`
   },
   {
     src: speakerID,
     label: 'Speaker Identification',
-    explanation:
-      'Determining who is speaking in a comic panel requires interpreting a mix of visual cues, such as the direction of speech bubble tails, character positioning, facial expressions, or even gaze. In complex scenes with overlapping bubbles or multiple speakers, ambiguity often arises. While readers can rely on narrative logic and context, algorithms frequently struggle with this task, making speaker identification a significant challenge in comic understanding.'
+    explanation: `Speaker identification is the process of determining which character is delivering a line of dialogue within a panel. Readers draw on a blend of clues: the direction and length of a speech bubble tail, the position of characters, subtle facial cues, or even a character’s posture and gaze. In crowded scenes with overlapping bubbles or multiple speakers, this becomes much trickier. While humans naturally rely on logic and context, algorithms must disentangle a web of visual signals to correctly assign each voice to its speaker.`
   },
   {
     src: sceneDetect,
     label: 'Scene Detection',
-    explanation:
-      'Scene detection involves recognizing when a comic shifts to a new setting, time period, or narrative thread. These transitions may span multiple panels and are often implied rather than explicitly marked. Artists use subtle signals such as background changes, color palette shifts, or layout transformations. For readers and especially for computational systems, accurately detecting scene boundaries is vital for maintaining a coherent understanding of the story’s structure.'
+    explanation: `Scene detection is about recognizing when the narrative shifts to a new place, time, or storyline. In comics, these transitions are often implied rather than directly stated, unfolding over several panels. Artists may signal a scene change through a shift in background details, a dramatic color palette change, or an alteration in panel structure. For readers, these cues work subconsciously; for computational systems, detecting scene boundaries is critical to preserving the story’s structure and making sense of its unfolding events.`
   }
 ];
+
 const props = defineProps({
   title: {
     type: String,

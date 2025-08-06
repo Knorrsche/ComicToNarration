@@ -9,26 +9,22 @@ const concepts = [
   {
     src: panelImage,
     label: 'Comic Panel',
-    explanation:
-      'Comic panels are the essential frames through which stories unfold. Each panel captures a distinct moment, and together, they create a sequence of actions or emotions. Artists vary the size, shape, and layout of panels to influence pacing and emphasis, a large panel might spotlight a dramatic event, while smaller, tightly packed panels can heighten tension or quicken the story’s rhythm.'
+    explanation: `Comic panels are the building blocks of visual storytelling. Each one captures a frozen moment in time, a single beat of the narrative, while the arrangement of multiple panels creates a sense of motion and continuity. Artists use panel size, shape, and placement to control pacing and emphasis: a full-page panel can stop the reader in awe, while a sequence of small, narrow panels can quicken the rhythm and heighten urgency. In essence, panels are where the story comes to life, one frame at a time.`
   },
   {
     src: gutterImage,
     label: 'Gutter',
-    explanation:
-      'The gutter is the often-overlooked space between panels, but it plays a vital role in storytelling. This empty zone invites readers to fill in the gaps between scenes, imagining what happens in the transition. This process is called "closure," and it’s what transforms static images into a dynamic narrative in the reader’s mind.'
+    explanation: `The gutter, the empty space between panels, may seem insignificant, but it is where much of the magic of comics happens. This gap represents a pause in the visual sequence, prompting readers to imagine what occurs between the depicted moments. This mental process, known as "closure," transforms a static series of images into a continuous, living story. In skilled hands, the gutter becomes an invisible storyteller, shaping tension, surprise, and emotional impact without ever showing a single line.`
   },
   {
     src: bubbleImage,
     label: 'Speech Bubble',
-    explanation:
-      'Speech bubbles give voice to comic characters. These graphic elements carry dialogue, inner monologues, and sound effects, all while conveying tone through shape and design. A spiky bubble may indicate yelling, while a soft, cloud-like one might represent a thought. Speech bubbles also guide the reader’s eye across the page and define the rhythm of conversations.'
+    explanation: `Speech bubbles are the voices of the comic world. They not only carry dialogue, inner thoughts, and sound effects but also express tone and emotion through their design. A jagged bubble might explode with anger or urgency, while a cloud-like one floats gently with introspection. Beyond their visual flair, speech bubbles act as guides for the reader’s eyes, leading them from one moment to the next and setting the rhythm of conversations across the page.`
   },
   {
     src: entityImage,
     label: 'Entities (Characters & Objects)',
-    explanation:
-      'Entities, such as characters, props, and symbols,  are the visual anchors of each comic panel. They convey plot, emotion, and personality. Artists use body language, facial expressions, and spatial composition to highlight these elements. Understanding how entities are depicted and emphasized helps in decoding the scene and following the story’s emotional beats.'
+    explanation: `Entities, whether characters, objects, or symbolic elements, are the focal points of each panel. They carry the story’s action, emotion, and personality. Artists convey their importance through body language, facial expressions, framing, and positioning within the scene. Even small background details can speak volumes, adding depth to the world and enriching the reader’s understanding of the moment. Recognizing how these elements interact is key to fully appreciating a comic’s narrative and emotional beats.`
   }
 ];
 

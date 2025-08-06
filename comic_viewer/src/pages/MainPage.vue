@@ -5,16 +5,16 @@ import InfoBox from '../components/InfoBox.vue'
 import GraphicNovelDifference from '../components/GraphicNovelDifference.vue'
 import ComicParts from '../components/ComicParts.vue'
 import Challenges from '../components/Challenges.vue'
-import InteractiveMlPage from './InteractiveMlPage.vue'
+import InteractiveDetectionPage from './InteractiveDetectionPage.vue'
 import InteractiveDlPage from './InteractiveDlPage.vue'
 
 const sections = [
-  { id: "header", title: "Intro", component: Header },
-  { id: "info", title: "Visual Impairment", component: InfoBox },
-  { id: "gn-diff", title: "Graphic Novels", component: GraphicNovelDifference },
-  { id: "parts", title: "Parts of Comics", component: ComicParts },
-  { id: "challenges", title: "Challenges", component: Challenges },
-  { id: "ml", title: "Machine Learning", component: InteractiveMlPage },
+  { id: "intro", title: "Intro", component: Header },
+  { id: "motivation", title: "Motivation", component: InfoBox },
+  { id: "formats", title: "Storytelling Formats", component: GraphicNovelDifference },
+  { id: "parts", title: "What Makes a Comic", component: ComicParts },
+  { id: "challenges", title: "Processing Challenges", component: Challenges },
+  { id: "rb", title: "Comic Processing", component: InteractiveDetectionPage },
   { id: "dl", title: "Deep Learning", component: InteractiveDlPage }
 ]
 </script>

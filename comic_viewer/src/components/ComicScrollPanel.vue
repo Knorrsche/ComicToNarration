@@ -59,7 +59,12 @@ onMounted(async () => {
 
 <template>
   <div class="comic-scroll-panel">
-    <h3 class="panel-title">Select a Comic</h3>
+    <!-- Static Header -->
+    <div class="panel-title">
+      Select a Comic
+    </div>
+
+    <!-- Scrollable Comic List -->
     <div class="scroll-container">
       <div
         v-for="(comic, index) in comicList"
@@ -84,40 +89,59 @@ onMounted(async () => {
   --orange-hover: #c45d1f;
 }
 
+/* Outer Container */
 .comic-scroll-panel {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  height: 100%;
+  max-height: 75vh;
+  background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(249,249,249,0.65));
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
+/* Static Header */
 .panel-title {
   font-size: 1.4rem;
   font-weight: bold;
-  color: var(--orange);
-  margin-bottom: 0.5rem;
+  color: white;
+  background: linear-gradient(135deg, var(--orange), var(--orange-hover));
+  text-align: center;
+  padding: 0.8rem 1rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
+/* Scrollable Comic Container */
 .scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  gap: 14px;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  max-height: 65vh;
-  gap: 14px;
-  padding-right: 6px;
 }
 
-/* Custom scrollbar */
+/* Custom Scrollbar */
 .scroll-container::-webkit-scrollbar {
   width: 8px;
 }
 .scroll-container::-webkit-scrollbar-thumb {
-  background-color: rgba(218, 116, 52, 0.5);
+  background-color: var(--orange);
   border-radius: 4px;
 }
 .scroll-container::-webkit-scrollbar-track {
   background-color: transparent;
 }
 
+/* Comic Card */
 .comic-card {
   background: white;
   border-radius: 12px;
@@ -126,12 +150,12 @@ onMounted(async () => {
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
 .comic-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 
+/* Thumbnail Image */
 .comic-thumbnail {
   width: 100%;
   height: 420px;
@@ -139,10 +163,11 @@ onMounted(async () => {
   display: block;
 }
 
+/* Comic Name */
 .comic-name {
   padding: 0.5rem;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #333;
   text-align: center;
   background: #fafafa;

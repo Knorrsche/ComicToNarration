@@ -1,26 +1,15 @@
 <template>
   <div class="layout">
-    <!-- Modern Hamburger Menu -->
-    <button class="hamburger" @click="toggleMenu" aria-label="Toggle Menu">
-      <span></span>
-      <span></span>
-      <span></span>
+    <!-- Return Button -->
+    <button class="return-btn" @click="goBack" aria-label="Go Back">
+      ⟵
     </button>
-
-    <!-- Sidebar -->
-    <nav class="sidebar" :class="{ open: isMenuOpen }">
-      <ul>
-        <li v-for="section in sections" :key="section.id">
-          <a :href="'/#' + section.id" @click="isMenuOpen = false">{{ section.title }}</a>
-        </li>
-      </ul>
-    </nav>
 
     <!-- Main Content -->
     <div class="content-wrapper">
       <!-- Viewer Section -->
       <div class="viewer-section" v-if="comic">
-        <div v-if="imageSrc">
+        <div v-if="imageSrc" class="viewer-card">
           <!-- Controls -->
           <div class="buttons">
             <button :class="{ active: showPanels }" @click="showPanels = !showPanels" style="--active-color: #007bff">
@@ -39,7 +28,13 @@
 
           <!-- Image Viewer -->
           <div class="image-viewer" ref="wrapperRef">
-            <img :src="imageSrc" @load="onImageLoad" ref="imageRef" alt="Processed comic" class="comic-image" />
+            <img
+              :src="imageSrc"
+              @load="onImageLoad"
+              ref="imageRef"
+              alt="Processed comic"
+              class="comic-image"
+            />
 
             <!-- Navigation Buttons -->
             <button
@@ -80,41 +75,20 @@
 
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import ComicScrollPanel from "../components/ComicScrollPanel.vue";
 import { detectionParams } from "../stores/detectionParams";
 
-import Header from '../components/Header.vue'
-import InfoBox from '../components/InfoBox.vue'
-import GraphicNovelDifference from '../components/GraphicNovelDifference.vue'
-import ComicParts from '../components/ComicParts.vue'
-import Challenges from '../components/Challenges.vue'
-import InteractiveMlPage from './InteractiveMlPage.vue'
-import InteractiveDlPage from './InteractiveDlPage.vue'
-
-// Sidebar Menu
-const sections = [
-  { id: "header", title: "Intro", component: Header },
-  { id: "info", title: "The Visual Impaired", component: InfoBox },
-  { id: "gn-diff", title: "Types of Graphic Novels", component: GraphicNovelDifference },
-  { id: "parts", title: "Parts of Comics", component: ComicParts },
-  { id: "challenges", title: "Challenges", component: Challenges },
-  { id: "ml", title: "Machine Learning", component: InteractiveMlPage },
-  { id: "dl", title: "Deep Learning", component: InteractiveDlPage }
-]
-
-const isMenuOpen = ref(false);
-const toggleMenu = () => {
-  isMenuOpen.value = !isMenuOpen.value;
+const router = useRouter();
+const goBack = () => {
+  router.push({ path: '/' });
 };
 
-// Mobile detection
 const isMobile = ref(false);
 const checkMobile = () => {
   isMobile.value = window.innerWidth <= 768;
 };
 
-// Viewer logic
 const route = useRoute();
 const comic = ref(route.params.comic);
 const pages = ref([]);
@@ -128,17 +102,16 @@ const showPanels = ref(true);
 const showBubbles = ref(true);
 const showEntities = ref(true);
 
-const imageWidth = ref(0);
-const imageHeight = ref(0);
 const scaleX = ref(1);
 const scaleY = ref(1);
+const offsetX = ref(0);
+const offsetY = ref(0);
 
 const loading = ref(false);
 const detectionActive = ref(false);
 const processedImageSrc = ref(null);
 const originalImageSrc = ref('');
 
-// Apply detection
 async function applyDetection() {
   if (!imageSrc.value) return;
 
@@ -180,7 +153,6 @@ async function applyDetection() {
   }
 }
 
-// Fetch pages
 const fetchPages = async () => {
   const res = await fetch('http://localhost:8000/comics');
   const data = await res.json();
@@ -248,7 +220,6 @@ watch(() => route.params.comic, (newVal) => {
   fetchPages();
 });
 
-// Filter boxes
 const filteredBoundingBoxes = computed(() =>
   boundingBoxes.value.filter((box) => {
     if (box.type === "panel" && !showPanels.value) return false;
@@ -296,26 +267,27 @@ const extractBoxesFromXml = (xmlDoc, currentPageIndex) => {
 
 const updateScale = () => {
   const img = imageRef.value;
-  if (!img || img.naturalWidth === 0) return;
+  const container = wrapperRef.value;
+  if (!img || img.naturalWidth === 0 || !container) return;
 
-  const rect = img.getBoundingClientRect();
-  const containerRect = wrapperRef.value.getBoundingClientRect();
+  const imgRect = img.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
 
-  // Scale based on actual rendered image dimensions
-  imageWidth.value = rect.width;
-  imageHeight.value = rect.height;
+  scaleX.value = imgRect.width / img.naturalWidth;
+  scaleY.value = imgRect.height / img.naturalHeight;
 
-  scaleX.value = imageWidth.value / img.naturalWidth;
-  scaleY.value = imageHeight.value / img.naturalHeight;
+  offsetX.value = imgRect.left - containerRect.left;
+  offsetY.value = imgRect.top - containerRect.top;
 };
 
-const onImageLoad = () => {
+const onImageLoad = async () => {
+  await nextTick();
   updateScale();
 };
 
 const boxStyle = (box) => ({
-  top: `${box.y * scaleY.value}px`,
-  left: `${box.x * scaleX.value}px`,
+  top: `${box.y * scaleY.value + offsetY.value}px`,
+  left: `${box.x * scaleX.value + offsetX.value}px`,
   width: `${box.width * scaleX.value}px`,
   height: `${box.height * scaleY.value}px`,
   position: "absolute",
@@ -323,84 +295,37 @@ const boxStyle = (box) => ({
 </script>
 
 <style scoped>
-:root {
+:global(:root) {
   --orange: #da7434;
   --orange-hover: #c45d1f;
 }
 
-/* Layout */
 .layout {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-/* Modern Hamburger */
-.hamburger {
+.return-btn {
   position: fixed;
   top: 1rem;
   left: 1rem;
   z-index: 1100;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 34px;
-  height: 26px;
-  background: white;
-  border: 2px solid var(--orange);
-  border-radius: 8px;
-  padding: 6px;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-.hamburger:hover {
-  background: #fff4ee;
-  transform: scale(1.05);
-}
-.hamburger span {
-  display: block;
-  height: 3px;
   background: var(--orange);
-  border-radius: 2px;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  transition: background 0.2s ease;
+}
+.return-btn:hover {
+  background: var(--orange-hover);
 }
 
-/* Sidebar with glass effect */
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: -250px;
-  height: 100vh;
-  width: 250px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  padding-top: 4rem;
-  z-index: 1000;
-  transition: left 0.3s ease;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.15);
-}
-.sidebar.open {
-  left: 0;
-}
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.sidebar li {
-  margin: 1.2rem 0;
-  text-align: center;
-}
-.sidebar a {
-  color: var(--orange);
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-.sidebar a:hover {
-  color: var(--orange-hover);
-}
-
-/* Content layout */
 .content-wrapper {
   display: flex;
   width: 100%;
@@ -418,7 +343,18 @@ const boxStyle = (box) => ({
   max-width: 65vw;
 }
 
-/* Glass style image viewer */
+.viewer-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+  align-items: center;
+}
+
 .image-viewer {
   position: relative;
   width: 100%;
@@ -427,16 +363,17 @@ const boxStyle = (box) => ({
   backdrop-filter: blur(12px);
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  overflow: hidden; /* ensures overlays align */
+  overflow: hidden;
 }
 
 .comic-image {
-  max-width: 100%;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
   max-height: 80vh;
   border-radius: 12px;
 }
 
-/* Overlay Nav Buttons */
 .image-nav-btn {
   position: absolute;
   top: 50%;
@@ -457,7 +394,6 @@ const boxStyle = (box) => ({
 }
 .image-nav-btn:disabled {
   background: rgba(0,0,0,0.2);
-  cursor: default;
 }
 .image-nav-btn.left {
   left: 10px;
@@ -466,7 +402,6 @@ const boxStyle = (box) => ({
   right: 10px;
 }
 
-/* Bounding boxes with glow */
 .box-overlay {
   pointer-events: none;
   position: absolute;
@@ -485,7 +420,6 @@ const boxStyle = (box) => ({
   box-shadow: 0 0 6px rgba(40, 167, 69, 0.6);
 }
 
-/* Control buttons */
 .buttons {
   margin-bottom: 15px;
   display: flex;
@@ -510,7 +444,6 @@ button.active {
   color: white;
 }
 
-/* Mobile layout */
 @media (max-width: 768px) {
   .content-wrapper {
     flex-direction: column;

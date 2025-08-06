@@ -2,7 +2,7 @@
   <div v-if="imageSrc" class="viewer-wrapper">
     <!-- Title -->
     <header class="viewer-title">
-      Interactive Comic Panel & Speech Bubble Detection
+      Comic Processing
     </header>
 
     <div class="viewer">
@@ -20,22 +20,34 @@
       <div class="explanation-box">
         <!-- Tab Buttons -->
         <div class="tab-buttons">
+          <button @click="activeTab = 'text'" :class="{ active: activeTab === 'text' }">Rule-Based Detection</button>
           <button @click="activeTab = 'panel'" :class="{ active: activeTab === 'panel' }">Panel Parameters</button>
           <button @click="activeTab = 'bubble'" :class="{ active: activeTab === 'bubble' }">Bubble Parameters</button>
-          <button @click="activeTab = 'text'" :class="{ active: activeTab === 'text' }">Text</button>
           <button class="secondary" @click="perfect_setup">Perfect Setup</button>
         </div>
 
         <!-- Text Tab -->
-        <div v-if="activeTab === 'text'" class="tab-content">
-          <h3>Machine Learning in Comics</h3>
-          <p>
-            Deep learning is a subset of machine learning that uses layered neural networks
-            to automatically learn features from large datasets. In the context of comics,
-            these models can detect panels, speech bubbles, and even text regions to enhance
-            accessibility and automate processing.
-          </p>
-        </div>
+<div v-if="activeTab === 'text'" class="tab-content">
+  <h3>Rule-Based Detection in Comics</h3>
+  <p>
+    Before modern machine learning methods, panel and speech bubble detection relied on
+    hand-crafted rules and expert systems. These approaches used fixed parameters,
+    such as color thresholds, geometric shapes, and edge detection filters, to identify
+    visual elements. For example, rectangular panel borders could be detected by looking
+    for straight, high-contrast lines, while circular or oval shapes might signal speech bubbles.
+  </p>
+  <p>
+    While rule-based systems can perform well in controlled settings, they struggle when
+    confronted with the variety and creativity found in real comics. Variations in art style,
+    non-standard layouts, textured backgrounds, or unconventional bubble designs often
+    break these rigid rules.
+  </p>
+  <p>
+  You can try it yourself using the provided comic page and the adjustable detection
+  parameters. Experiment with different settings to see how well you can
+  detect all panels and speech bubbles.
+</p>
+</div>
 
         <!-- Panel Parameters -->
         <div v-else-if="activeTab === 'panel'" class="tab-content">
