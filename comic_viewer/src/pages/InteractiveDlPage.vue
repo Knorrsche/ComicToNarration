@@ -120,42 +120,31 @@ const props = defineProps({
   flex-direction: column;
   justify-content: center;
   padding: 2rem;
-  overflow-y: auto;
-}
-
-/* Orange scrollbar for explanation box */
-.explanation-box::-webkit-scrollbar {
-  width: 8px;
-}
-.explanation-box::-webkit-scrollbar-thumb {
-  background-color: var(--orange);
-  border-radius: 4px;
-}
-.explanation-box::-webkit-scrollbar-track {
-  background: transparent;
+  overflow: hidden; /* remove scrollbar */
 }
 
 .explanation-box h3 {
-  font-size: 1.3rem;
+  font-size: clamp(1rem, 1.5vw, 1.3rem); /* shrink title if needed */
   margin-bottom: 0.8rem;
   color: var(--orange);
 }
 .explanation-box p {
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: clamp(0.8rem, 1vw, 1rem); /* shrink text instead of scrolling */
+  line-height: 1.4;
   color: var(--text-dark);
+  white-space: pre-line;
 }
 
 /* Comic Scroll Panel Wrapper */
 .image-viewer {
   flex: 1;
   display: flex;
-  flex-direction: column; /* stack vertically */
-  align-items: flex-start; /* align to top */
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: flex-start;
   overflow-y: auto;
   max-height: 100%;
-  padding-top: 0.5rem; /* ensure top content visible */
+  padding-top: 0.5rem;
 }
 
 /* Orange scrollbar for comic list */

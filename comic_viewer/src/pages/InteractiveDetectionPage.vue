@@ -27,27 +27,27 @@
         </div>
 
         <!-- Text Tab -->
-<div v-if="activeTab === 'text'" class="tab-content">
-  <h3>Rule-Based Detection in Comics</h3>
-  <p>
-    Before modern machine learning methods, panel and speech bubble detection relied on
-    hand-crafted rules and expert systems. These approaches used fixed parameters,
-    such as color thresholds, geometric shapes, and edge detection filters, to identify
-    visual elements. For example, rectangular panel borders could be detected by looking
-    for straight, high-contrast lines, while circular or oval shapes might signal speech bubbles.
-  </p>
-  <p>
-    While rule-based systems can perform well in controlled settings, they struggle when
-    confronted with the variety and creativity found in real comics. Variations in art style,
-    non-standard layouts, textured backgrounds, or unconventional bubble designs often
-    break these rigid rules.
-  </p>
-  <p>
-  You can try it yourself using the provided comic page and the adjustable detection
-  parameters. Experiment with different settings to see how well you can
-  detect all panels and speech bubbles.
-</p>
-</div>
+        <div v-if="activeTab === 'text'" class="tab-content">
+          <h3>Rule-Based Detection in Comics</h3>
+          <p>
+            Before modern machine learning methods, panel and speech bubble detection relied on
+            hand-crafted rules and expert systems. These approaches used fixed parameters,
+            such as color thresholds, geometric shapes, and edge detection filters, to identify
+            visual elements. For example, rectangular panel borders could be detected by looking
+            for straight, high-contrast lines, while circular or oval shapes might signal speech bubbles.
+          </p>
+          <p>
+            While rule-based systems can perform well in controlled settings, they struggle when
+            confronted with the variety and creativity found in real comics. Variations in art style,
+            non-standard layouts, textured backgrounds, or unconventional bubble designs often
+            break these rigid rules.
+          </p>
+          <p>
+            You can try it yourself using the provided comic page and the adjustable detection
+            parameters. Experiment with different settings to see how well you can
+            detect all panels and speech bubbles.
+          </p>
+        </div>
 
         <!-- Panel Parameters -->
         <div v-else-if="activeTab === 'panel'" class="tab-content">
@@ -93,7 +93,6 @@ const error = ref(null);
 
 const activeTab = ref("text");
 
-// Panel parameters
 const panelParams = [
   { label: "Blur Kernel Size", key: "blur", attrs: { min: 1, max: 15, step: 2, type: "range" } },
   { label: "Threshold", key: "threshold", attrs: { min: 0, max: 255, type: "range" } },
@@ -101,7 +100,6 @@ const panelParams = [
   { label: "Min Panel Size", key: "minSize", attrs: { min: 10, max: 300, type: "range" } }
 ];
 
-// Bubble parameters
 const bubbleParams = [
   { label: "Bubble Threshold", key: "bubbleThreshold", attrs: { min: 100, max: 255, type: "range" } },
   { label: "Min Circularity", key: "minCircularity", attrs: { min: 0.01, max: 1.0, step: 0.01, type: "range" } },
@@ -224,9 +222,9 @@ function resetImage() {
   backdrop-filter: blur(10px);
   border-radius: 16px;
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* remove scroll */
 }
 
 .tab-buttons {
@@ -265,6 +263,19 @@ function resetImage() {
 .tab-buttons button.secondary:hover {
   background: var(--orange-hover);
   color: white;
+}
+
+.tab-content h3 {
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
+  margin-bottom: 0.8rem;
+  color: var(--orange);
+}
+
+.tab-content p {
+  font-size: clamp(0.8rem, 1vw, 1rem);
+  line-height: 1.4;
+  color: #333;
+  white-space: pre-line;
 }
 
 .param-group {

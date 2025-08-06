@@ -178,28 +178,20 @@ const goToImage = (index) => {
   flex-direction: column;
   justify-content: center;
   padding: 2rem;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--orange) transparent;
-}
-.explanation-box::-webkit-scrollbar {
-  width: 6px;
-}
-.explanation-box::-webkit-scrollbar-thumb {
-  background-color: var(--orange);
-  border-radius: 4px;
+  overflow: hidden; /* remove scrollbars */
 }
 
 .explanation-box h3 {
-  font-size: 1.3rem;
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
   margin-bottom: 0.8rem;
   color: var(--orange);
   animation: fadeIn 0.35s ease;
 }
+
 .explanation-box p {
   white-space: pre-line;
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: clamp(0.8rem, 1vw, 1rem); /* scales text if space is limited */
+  line-height: 1.4;
   color: var(--text-dark);
   animation: fadeIn 0.35s ease;
 }
