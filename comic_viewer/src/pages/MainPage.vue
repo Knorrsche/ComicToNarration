@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue';
 import SidebarMenu from '../components/SidebarMenu.vue'
 import Header from '../components/Header.vue'
 import Motivation from '../components/Motivation.vue'
@@ -16,14 +17,28 @@ const sections = [
   { id: "challenges", title: "Processing Challenges", component: Challenges },
   { id: "rb", title: "Comic Processing", component: InteractiveDetectionPage },
   { id: "dl", title: "Deep Learning", component: InteractiveDlPage }
-]
+];
+
+const scrollContainer = ref(null);
+
+const scrollToSection = (id) => {
+  const container = scrollContainer.value;
+  if (!container) return;
+  const target = container.querySelector(`#${id}`);
+  if (!target) return;
+
+  container.scrollTo({
+    top: target.offsetTop,
+    behavior: 'smooth',
+  });
+};
 </script>
 
 <template>
   <div class="layout">
-    <SidebarMenu :sections="sections" />
+    <SidebarMenu :sections="sections" @navigate="scrollToSection" />
 
-    <div class="scroll-container">
+    <div class="scroll-container" ref="scrollContainer">
       <section
         v-for="section in sections"
         :key="section.id"
@@ -43,11 +58,16 @@ const sections = [
   overflow-y: auto;
   scroll-behavior: smooth;
   scroll-snap-type: y mandatory;
-
 }
 
 .scroll-container::-webkit-scrollbar {
-  display: none;
+  width: 0;
+  height: 0;
+}
+
+.scroll-container {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .content-section {
