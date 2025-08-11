@@ -57,23 +57,33 @@ const goToImage = (index) => {
       </header>
     </transition>
 
-    <button
-      class="nav-btn left"
-      @click="prevImage"
-      :disabled="currentIndex === 0"
-      aria-label="Previous"
-    >
-      ◀
-    </button>
+<button
+  class="nav-btn left"
+  @click="prevImage"
+  :disabled="currentIndex === 0"
+  aria-label="Previous"
+>
+  <svg fill="var(--orange)" viewBox="0 0 45.513 45.512" width="36" height="36" xmlns="http://www.w3.org/2000/svg" transform="rotate(180)">
+    <path d="M44.275,19.739L30.211,5.675c-0.909-0.909-2.275-1.18-3.463-0.687c-1.188,0.493-1.959,1.654-1.956,2.938l0.015,5.903
+      l-21.64,0.054C1.414,13.887-0.004,15.312,0,17.065l0.028,11.522c0.002,0.842,0.338,1.648,0.935,2.242
+      s1.405,0.927,2.247,0.925l21.64-0.054l0.014,5.899c0.004,1.286,0.781,2.442,1.971,2.931c1.189,0.487,2.557,0.21,3.46-0.703
+      L44.29,25.694C45.926,24.043,45.92,21.381,44.275,19.739z"/>
+  </svg>
+</button>
 
-    <button
-      class="nav-btn right"
-      @click="nextImage"
-      :disabled="currentIndex === images.length - 1"
-      aria-label="Next"
-    >
-      ▶
-    </button>
+<button
+  class="nav-btn right"
+  @click="nextImage"
+  :disabled="currentIndex === images.length - 1"
+  aria-label="Next"
+>
+  <svg fill="var(--orange)" viewBox="0 0 45.513 45.512" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+    <path d="M44.275,19.739L30.211,5.675c-0.909-0.909-2.275-1.18-3.463-0.687c-1.188,0.493-1.959,1.654-1.956,2.938l0.015,5.903
+      l-21.64,0.054C1.414,13.887-0.004,15.312,0,17.065l0.028,11.522c0.002,0.842,0.338,1.648,0.935,2.242
+      s1.405,0.927,2.247,0.925l21.64-0.054l0.014,5.899c0.004,1.286,0.781,2.442,1.971,2.931c1.189,0.487,2.557,0.21,3.46-0.703
+      L44.29,25.694C45.926,24.043,45.92,21.381,44.275,19.739z"/>
+  </svg>
+</button>
 
     <transition :name="slideDirection === 'next' ? 'slide-next' : 'slide-prev'" mode="out-in">
       <div :key="currentIndex" class="viewer">
@@ -208,45 +218,76 @@ const goToImage = (index) => {
   position: absolute;
   top: 50%;
   transform: translateY(-50%) scale(1.05);
-  background: #c45d1f;
-  color: white;
+  background: transparent;
+  color: var(--orange);
   font-size: clamp(1.5rem, 3vw, 2rem);
-  padding: 0.6rem 1rem;
-  border: none;
-  border-radius: 50%;
+  padding: 0.6rem;
+  border-radius: 50px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  transition: all 0.25s ease;
+  box-shadow: none;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid var(--orange);
 }
+
+.nav-btn:hover:not(:disabled) {
+  border-color: var(--orange-light);
+  transform: translateY(-50%) scale(1.3);
+  box-shadow: 0 4px 12px rgba(218, 116, 52, 0.3);
+}
+
+.nav-btn:active:not(:disabled) {
+  transform: translateY(-50%) scale(1.05);
+}
+
 .nav-btn:disabled {
-  background: rgba(0,0,0,0.2);
+  color: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.05);
   transform: translateY(-50%) scale(1);
   cursor: default;
+  border: 2px solid gray;
+}
+
+.nav-btn:disabled svg {
+  fill: gray;
 }
 .nav-btn.left { left: 1rem; }
 .nav-btn.right { right: 1rem; }
 
 .dots {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   margin-top: 0.5rem;
 }
+
 .dots span {
-  width: 12px;
-  height: 12px;
+  width: 24px;
+  height: 24px;
   background: rgba(218, 116, 52, 0.4);
   border-radius: 50%;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.25s ease;
+  border: 2px solid transparent;
+  transition:
+    background 0.3s ease,
+    transform 0.25s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
 }
+
 .dots span:hover {
-  background: rgba(218, 116, 52, 0.7);
-  transform: scale(1.2);
+  background: var(--orange-light);
+  border-color: var(--orange);
+  transform: scale(1.4);
 }
+
 .dots span.active {
   background: var(--orange);
-  transform: scale(1.3);
+  border-color: var(--orange-light);
+  transform: scale(1.6);
 }
 
 .slide-next-enter-active, .slide-prev-enter-active,
@@ -294,6 +335,12 @@ const goToImage = (index) => {
     flex: 1;
     height: auto;
     padding: 1rem;
+  }
+  .nav-btn {
+    background: transparent !important;
+    box-shadow: none !important;
+    color: var(--orange);
+    padding: 0.4rem;
   }
   .nav-btn.left { left: 0.5rem; }
   .nav-btn.right { right: 0.5rem; }

@@ -1,8 +1,21 @@
 <template>
-  <div class="layout">
-    <button class="return-btn" @click="goBack" aria-label="Go Back">
-      ◀
-    </button>
+<div :class="['layout', { exiting: isExiting }]">
+  <button class="return-btn" @click="goBack" aria-label="Go Back">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="64"
+    height="64"
+    viewBox="0 0 45.58 45.58"
+    fill="var(--orange)"
+  >
+    <path
+      d="M45.506,33.532c-1.741-7.42-7.161-17.758-23.554-19.942V7.047c0-1.364-0.826-2.593-2.087-3.113
+      c-1.261-0.521-2.712-0.229-3.675,0.737L1.305,19.63c-1.739,1.748-1.74,4.572-0.001,6.32L16.19,40.909
+      c0.961,0.966,2.415,1.258,3.676,0.737c1.261-0.521,2.087-1.75,2.087-3.113v-6.331c5.593,0.007,13.656,0.743,19.392,4.313
+      c0.953,0.594,2.168,0.555,3.08-0.101C45.335,35.762,45.763,34.624,45.506,33.532z"
+    />
+  </svg>
+</button>
 
     <div class="content-wrapper">
       <div class="viewer-section" v-if="comic">
@@ -18,7 +31,7 @@
               Entities
             </button>
             <button :disabled="loading" @click="applyDetection" style="--active-color: #ff9800">
-              {{ loading ? 'Processing...' : detectionActive ? 'Remove Detection' : 'Apply Detection' }}
+              {{ loading ? 'Processing...' : detectionActive ? 'Remove Detection' : 'Apply Manual Detection' }}
             </button>
           </div>
 
@@ -31,22 +44,51 @@
               class="comic-image"
             />
 
-            <button
-              class="image-nav-btn left"
-              @click="prevPage"
-              :disabled="pageIndex === 0"
-              aria-label="Previous Page"
-            >
-              ◀
-            </button>
-            <button
-              class="image-nav-btn right"
-              @click="nextPage"
-              :disabled="pageIndex === pages.length - 1"
-              aria-label="Next Page"
-            >
-              ▶
-            </button>
+<button
+  class="image-nav-btn left"
+  @click="prevPage"
+  :disabled="pageIndex === 0"
+  aria-label="Previous Page"
+>
+  <svg
+    fill="var(--orange)"
+    viewBox="0 0 45.513 45.512"
+    width="36"
+    height="36"
+    xmlns="http://www.w3.org/2000/svg"
+    transform="rotate(180)"
+  >
+    <path
+      d="M44.275,19.739L30.211,5.675c-0.909-0.909-2.275-1.18-3.463-0.687c-1.188,0.493-1.959,1.654-1.956,2.938l0.015,5.903
+      l-21.64,0.054C1.414,13.887-0.004,15.312,0,17.065l0.028,11.522c0.002,0.842,0.338,1.648,0.935,2.242
+      s1.405,0.927,2.247,0.925l21.64-0.054l0.014,5.899c0.004,1.286,0.781,2.442,1.971,2.931c1.189,0.487,2.557,0.21,3.46-0.703
+      L44.29,25.694C45.926,24.043,45.92,21.381,44.275,19.739z"
+    />
+  </svg>
+</button>
+
+<button
+  class="image-nav-btn right"
+  @click="nextPage"
+  :disabled="pageIndex === pages.length - 1"
+  aria-label="Next Page"
+>
+  <svg
+    fill="var(--orange)"
+    viewBox="0 0 45.513 45.512"
+    width="36"
+    height="36"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M44.275,19.739L30.211,5.675c-0.909-0.909-2.275-1.18-3.463-0.687c-1.188,0.493-1.959,1.654-1.956,2.938l0.015,5.903
+      l-21.64,0.054C1.414,13.887-0.004,15.312,0,17.065l0.028,11.522c0.002,0.842,0.338,1.648,0.935,2.242
+      s1.405,0.927,2.247,0.925l21.64-0.054l0.014,5.899c0.004,1.286,0.781,2.442,1.971,2.931c1.189,0.487,2.557,0.21,3.46-0.703
+      L44.29,25.694C45.926,24.043,45.92,21.381,44.275,19.739z"
+    />
+  </svg>
+</button>
+
 
             <div
               v-for="(box, index) in filteredBoundingBoxes"
@@ -72,8 +114,13 @@ import ComicScrollPanel from "../components/ComicScrollPanel.vue";
 import { detectionParams } from "../stores/detectionParams";
 
 const router = useRouter();
+const isExiting = ref(false);
+
 const goBack = () => {
-  router.push({ path: '/' });
+  isExiting.value = true;
+  setTimeout(() => {
+    router.push({ path: '/' });
+  }, 300);
 };
 
 const isMobile = ref(false);
@@ -296,26 +343,27 @@ const boxStyle = (box) => ({
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  transition: opacity 0.3s ease;
+  opacity: 1;
 }
-
+.layout.exiting {
+  opacity: 0;
+  pointer-events: none;
+}
 .return-btn {
   position: fixed;
   top: 1rem;
   left: 1rem;
   z-index: 1100;
-  background: var(--orange);
-  color: white;
+  background: none;
   border: none;
-  border-radius: 50%;
-  width: 42px;
-  height: 42px;
-  font-size: 1.2rem;
+  padding: 0;
   cursor: pointer;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-  transition: background 0.2s ease;
+  transition: transform 0.2s ease;
 }
-.return-btn:hover {
-  background: var(--orange-hover);
+.return-btn:hover svg {
+  fill: var(--orange-hover);
+  transform: scale(1.1);
 }
 
 .content-wrapper {
@@ -369,30 +417,47 @@ const boxStyle = (box) => ({
 .image-nav-btn {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
-  background: var(--orange);
-  color: white;
-  font-size: 1.8rem;
-  padding: 0.5rem 0.8rem;
-  border: none;
-  border-radius: 50%;
+  transform: translateY(-50%) scale(1.05);
+  background: transparent;
+  color: var(--orange);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  padding: 0.6rem;
+  border-radius: 50px;
   cursor: pointer;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+  box-shadow: none;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid var(--orange);
 }
-.image-nav-btn:hover {
-  background: var(--orange-hover);
+
+.image-nav-btn:hover:not(:disabled) {
+  border-color: var(--orange-light);
+  transform: translateY(-50%) scale(1.3);
+  box-shadow: 0 4px 12px rgba(218, 116, 52, 0.3);
+}
+
+.image-nav-btn:active:not(:disabled) {
   transform: translateY(-50%) scale(1.05);
 }
+
 .image-nav-btn:disabled {
-  background: rgba(0,0,0,0.2);
+  color: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.05);
+  transform: translateY(-50%) scale(1);
+  cursor: default;
+  border: 2px solid gray;
 }
-.image-nav-btn.left {
-  left: 10px;
+
+.image-nav-btn:disabled svg {
+  fill: gray;
 }
-.image-nav-btn.right {
-  right: 10px;
-}
+.image-nav-btn.left { left: 1rem; }
+.image-nav-btn.right { right: 1rem; }
+
 
 .box-overlay {
   pointer-events: none;
@@ -437,6 +502,14 @@ button.active {
 }
 
 @media (max-width: 768px) {
+  .image-nav-btn {
+    background: transparent !important;
+    box-shadow: none !important;
+    color: var(--orange);
+    padding: 0.4rem;
+  }
+  .image-nav-btn.left { left: 0.5rem; }
+  .image-nav-btn.right { right: 0.5rem; }
   .content-wrapper {
     flex-direction: column;
     gap: 20px;
