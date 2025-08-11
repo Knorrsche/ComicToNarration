@@ -1,7 +1,7 @@
 <script setup>
-import example1 from '../assets/Spiderman.jpg';
-import example2 from '../assets/vagabond.jpg';
-import example3 from '../assets/Graphic_Novel.png';
+import example1 from '../assets/Normal.png';
+import example2 from '../assets/Manga_image.png';
+import example3 from '../assets/GraphicNovel.png';
 import ImageExplanationViewer from './ImageExplanationViewer.vue';
 
 const props = defineProps({

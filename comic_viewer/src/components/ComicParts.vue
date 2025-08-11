@@ -1,8 +1,8 @@
 <script setup>
-import panelImage from '../assets/panel.png';
-import gutterImage from '../assets/scene.png';
-import bubbleImage from '../assets/speaking_type.png';
-import entityImage from '../assets/crowded_entity.png';
+import panelImage from '../assets/Panels.png';
+import gutterImage from '../assets/Gutter.png';
+import bubbleImage from '../assets/SpeechBubbles.png';
+import entityImage from '../assets/Entities.png';
 import ImageExplanationViewer from './ImageExplanationViewer.vue';
 
 const concepts = [

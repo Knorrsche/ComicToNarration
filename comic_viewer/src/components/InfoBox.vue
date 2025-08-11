@@ -6,7 +6,7 @@
 
 <script setup>
 import ImageExplanationViewer from "./ImageExplanationViewer.vue";
-import Normal from "../assets/Normal.jpg"
+import Normal from "../assets/Normal.png"
 import Mediocore from "../assets/Mediocore.png"
 import Severe from "../assets/Severe.png"
 

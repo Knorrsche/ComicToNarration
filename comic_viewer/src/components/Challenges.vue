@@ -1,7 +1,7 @@
 <script setup>
-import entityMatch from '../assets/clustering.png';
-import speakerID from '../assets/speaker_iden.png';
-import sceneDetect from '../assets/scene.png';
+import entityMatch from '../assets/EntitiesMatched.png';
+import speakerID from '../assets/Speaker_identi.png';
+import sceneDetect from '../assets/Scenes.png';
 import ImageExplanationViewer from './ImageExplanationViewer.vue';
 
 const challenges = [

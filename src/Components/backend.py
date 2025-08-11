@@ -17,7 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from src.Components.cv_panel import detect_panels, detect_speech_bubbles
 
 app = FastAPI()
-ComicReader = ComicReader()
+#ComicReader = ComicReader()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", r"Data/comics"))

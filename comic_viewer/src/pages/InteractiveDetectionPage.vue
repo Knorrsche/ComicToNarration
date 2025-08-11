@@ -84,7 +84,7 @@
 <script setup>
 import { ref } from "vue";
 import { detectionParams } from "../stores/detectionParams";
-import ComicImage from "../assets/Normal.jpg";
+import ComicImage from "../assets/Normal.png";
 
 const imageSrc = ref(ComicImage);
 const processedImageSrc = ref(null);
@@ -209,8 +209,6 @@ function resetImage() {
 }
 
 .image-container img {
-  width: 80%;
-  height: 80%;
   object-fit: contain;
   border-radius: 12px;
 }
