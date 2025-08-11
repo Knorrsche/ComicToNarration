@@ -1,16 +1,12 @@
 <template>
   <div class="layout">
-    <!-- Return Button -->
     <button class="return-btn" @click="goBack" aria-label="Go Back">
-      ⟵
+      ◀
     </button>
 
-    <!-- Main Content -->
     <div class="content-wrapper">
-      <!-- Viewer Section -->
       <div class="viewer-section" v-if="comic">
         <div v-if="imageSrc" class="viewer-card">
-          <!-- Controls -->
           <div class="buttons">
             <button :class="{ active: showPanels }" @click="showPanels = !showPanels" style="--active-color: #007bff">
               Panels
@@ -26,7 +22,6 @@
             </button>
           </div>
 
-          <!-- Image Viewer -->
           <div class="image-viewer" ref="wrapperRef">
             <img
               :src="imageSrc"
@@ -36,7 +31,6 @@
               class="comic-image"
             />
 
-            <!-- Navigation Buttons -->
             <button
               class="image-nav-btn left"
               @click="prevPage"
@@ -54,7 +48,6 @@
               ▶
             </button>
 
-            <!-- Bounding Boxes -->
             <div
               v-for="(box, index) in filteredBoundingBoxes"
               :key="index"
@@ -65,7 +58,6 @@
         </div>
       </div>
 
-      <!-- Comic List (hidden on mobile) -->
       <div class="scroller-section" v-if="!isMobile">
         <ComicScrollPanel />
       </div>

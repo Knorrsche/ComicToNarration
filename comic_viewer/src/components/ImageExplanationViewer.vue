@@ -10,7 +10,7 @@ const props = defineProps({
 
 const currentIndex = ref(0);
 const displayTitle = ref(props.title);
-const slideDirection = ref('next'); // 'next' or 'prev'
+const slideDirection = ref('next');
 
 onMounted(() => {
   if (!displayTitle.value) {
@@ -51,14 +51,12 @@ const goToImage = (index) => {
 
 <template>
   <div v-if="images.length" class="viewer-wrapper">
-    <!-- Middle Title with transition -->
     <transition name="title-fade" mode="out-in">
       <header class="viewer-title" :key="currentIndex">
         {{ title }}
       </header>
     </transition>
 
-    <!-- Navigation Buttons -->
     <button
       class="nav-btn left"
       @click="prevImage"
@@ -77,16 +75,13 @@ const goToImage = (index) => {
       ▶
     </button>
 
-    <!-- Viewer Content with transition -->
     <transition :name="slideDirection === 'next' ? 'slide-next' : 'slide-prev'" mode="out-in">
       <div :key="currentIndex" class="viewer">
-        <!-- Explanation -->
         <div class="explanation-box">
           <h3>{{ images[currentIndex]?.label || "Explanation" }}</h3>
           <p>{{ explanations[currentIndex] || images[currentIndex]?.explanation || "No explanation available." }}</p>
         </div>
 
-        <!-- Image -->
         <div class="image-viewer">
           <div class="image-container">
             <img
@@ -99,7 +94,6 @@ const goToImage = (index) => {
       </div>
     </transition>
 
-    <!-- Pagination Dots -->
     <div class="dots">
       <span
         v-for="(img, index) in images"
@@ -128,7 +122,6 @@ const goToImage = (index) => {
   align-items: center;
 }
 
-/* Upgraded Viewer Title - Always Hover Style */
 .viewer-title {
   font-size: clamp(1.6rem, 2.2vw, 2.2rem);
   font-weight: 700;
@@ -150,13 +143,12 @@ const goToImage = (index) => {
   bottom: 6px;
   left: 50%;
   transform: translateX(-50%);
-  width: 70%; /* Always expanded underline */
+  width: 70%;
   height: 3px;
   background: rgba(255, 255, 255, 0.6);
   border-radius: 2px;
 }
 
-/* Viewer Layout - Always Hover Style */
 .viewer {
   display: flex;
   height: 70vh;
@@ -168,17 +160,16 @@ const goToImage = (index) => {
   border-radius: 16px;
   box-shadow: 0 6px 28px rgba(0, 0, 0, 0.12);
   padding: 1rem;
-  transform: translateY(-4px); /* Always lifted */
+  transform: translateY(-4px);
 }
 
-/* Explanation Box */
 .explanation-box {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 2rem;
-  overflow: hidden; /* remove scrollbars */
+  overflow: hidden;
 }
 
 .explanation-box h3 {
@@ -190,13 +181,12 @@ const goToImage = (index) => {
 
 .explanation-box p {
   white-space: pre-line;
-  font-size: clamp(0.8rem, 1vw, 1rem); /* scales text if space is limited */
+  font-size: clamp(0.8rem, 1vw, 1rem);
   line-height: 1.4;
   color: var(--text-dark);
   animation: fadeIn 0.35s ease;
 }
 
-/* Image Viewer */
 .image-viewer {
   flex: 1;
   display: flex;
@@ -210,11 +200,10 @@ const goToImage = (index) => {
   max-height: 90%;
   object-fit: contain;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(218, 116, 52, 0.25); /* Slightly stronger */
+  box-shadow: 0 4px 20px rgba(218, 116, 52, 0.25);
   animation: fadeIn 0.35s ease;
 }
 
-/* Navigation Buttons - Always Hover Style */
 .nav-btn {
   position: absolute;
   top: 50%;
@@ -238,7 +227,6 @@ const goToImage = (index) => {
 .nav-btn.left { left: 1rem; }
 .nav-btn.right { right: 1rem; }
 
-/* Pagination Dots */
 .dots {
   display: flex;
   gap: 8px;
@@ -261,7 +249,6 @@ const goToImage = (index) => {
   transform: scale(1.3);
 }
 
-/* Animations */
 .slide-next-enter-active, .slide-prev-enter-active,
 .slide-next-leave-active, .slide-prev-leave-active {
   transition: all 0.4s ease;
@@ -284,7 +271,6 @@ const goToImage = (index) => {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Mobile Layout */
 @media (max-width: 768px) {
   .viewer-wrapper {
     justify-content: center;
@@ -296,7 +282,7 @@ const goToImage = (index) => {
     max-width: 95%;
   }
   .image-viewer {
-    order: -1; /* Image above explanation */
+    order: -1;
     flex: 0 0 auto;
     height: auto;
     padding: 0.5rem 0;

@@ -1,8 +1,8 @@
 <script setup>
 import SidebarMenu from '../components/SidebarMenu.vue'
 import Header from '../components/Header.vue'
-import InfoBox from '../components/InfoBox.vue'
-import GraphicNovelDifference from '../components/GraphicNovelDifference.vue'
+import Motivation from '../components/Motivation.vue'
+import StorytellingFormats from '../components/StorytellingFormats.vue'
 import ComicParts from '../components/ComicParts.vue'
 import Challenges from '../components/Challenges.vue'
 import InteractiveDetectionPage from './InteractiveDetectionPage.vue'
@@ -10,8 +10,8 @@ import InteractiveDlPage from './InteractiveDlPage.vue'
 
 const sections = [
   { id: "intro", title: "Intro", component: Header },
-  { id: "motivation", title: "Motivation", component: InfoBox },
-  { id: "formats", title: "Storytelling Formats", component: GraphicNovelDifference },
+  { id: "motivation", title: "Motivation", component: Motivation },
+  { id: "formats", title: "Storytelling Formats", component: StorytellingFormats },
   { id: "parts", title: "What Makes a Comic", component: ComicParts },
   { id: "challenges", title: "Processing Challenges", component: Challenges },
   { id: "rb", title: "Comic Processing", component: InteractiveDetectionPage },
@@ -21,10 +21,8 @@ const sections = [
 
 <template>
   <div class="layout">
-    <!-- Shared Sidebar -->
     <SidebarMenu :sections="sections" />
 
-    <!-- Scrollable Content -->
     <div class="scroll-container">
       <section
         v-for="section in sections"

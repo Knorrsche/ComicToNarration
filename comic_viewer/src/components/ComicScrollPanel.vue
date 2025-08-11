@@ -59,12 +59,10 @@ onMounted(async () => {
 
 <template>
   <div class="comic-scroll-panel">
-    <!-- Static Header -->
     <div class="panel-title">
       Select a Comic
     </div>
 
-    <!-- Scrollable Comic List -->
     <div class="scroll-container">
       <div
         v-for="(comic, index) in comicList"
@@ -89,7 +87,6 @@ onMounted(async () => {
   --orange-hover: #c45d1f;
 }
 
-/* Outer Container */
 .comic-scroll-panel {
   display: flex;
   flex-direction: column;
@@ -103,7 +100,6 @@ onMounted(async () => {
   overflow: hidden;
 }
 
-/* Static Header */
 .panel-title {
   font-size: 1.4rem;
   font-weight: bold;
@@ -119,7 +115,6 @@ onMounted(async () => {
   letter-spacing: 0.5px;
 }
 
-/* Scrollable Comic Container */
 .scroll-container {
   flex: 1;
   overflow-y: auto;
@@ -129,7 +124,6 @@ onMounted(async () => {
   flex-direction: column;
 }
 
-/* Custom Scrollbar */
 .scroll-container::-webkit-scrollbar {
   width: 8px;
 }
@@ -141,7 +135,6 @@ onMounted(async () => {
   background-color: transparent;
 }
 
-/* Comic Card */
 .comic-card {
   background: white;
   border-radius: 12px;
@@ -155,7 +148,6 @@ onMounted(async () => {
   box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 
-/* Thumbnail Image */
 .comic-thumbnail {
   width: 100%;
   height: 420px;
@@ -163,7 +155,6 @@ onMounted(async () => {
   display: block;
 }
 
-/* Comic Name */
 .comic-name {
   padding: 0.5rem;
   font-weight: 600;

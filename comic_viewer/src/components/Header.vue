@@ -44,7 +44,7 @@ const props = defineProps({
   align-items: center;
   min-height: 100vh;
   padding: 2rem;
-  background: none; /* Removed gradient background */
+  background: none;
 }
 
 .header-content {
@@ -115,7 +115,6 @@ const props = defineProps({
   animation: bounce 2s infinite;
 }
 
-/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

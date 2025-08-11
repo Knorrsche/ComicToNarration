@@ -1,12 +1,10 @@
 <template>
   <div v-if="imageSrc" class="viewer-wrapper">
-    <!-- Title -->
     <header class="viewer-title">
       Comic Processing
     </header>
 
     <div class="viewer">
-      <!-- Image Section -->
       <div class="image-viewer">
         <div class="image-container">
           <img
@@ -16,9 +14,7 @@
         </div>
       </div>
 
-      <!-- Controls / Explanation -->
       <div class="explanation-box">
-        <!-- Tab Buttons -->
         <div class="tab-buttons">
           <button @click="activeTab = 'text'" :class="{ active: activeTab === 'text' }">Rule-Based Detection</button>
           <button @click="activeTab = 'panel'" :class="{ active: activeTab === 'panel' }">Panel Parameters</button>
@@ -26,7 +22,6 @@
           <button class="secondary" @click="perfect_setup">Perfect Setup</button>
         </div>
 
-        <!-- Text Tab -->
         <div v-if="activeTab === 'text'" class="tab-content">
           <h3>Rule-Based Detection in Comics</h3>
           <p>
@@ -49,7 +44,6 @@
           </p>
         </div>
 
-        <!-- Panel Parameters -->
         <div v-else-if="activeTab === 'panel'" class="tab-content">
           <h3>Panel Detection Parameters</h3>
           <div class="param-group" v-for="param in panelParams" :key="param.label">
@@ -58,7 +52,6 @@
           </div>
         </div>
 
-        <!-- Bubble Parameters -->
         <div v-else-if="activeTab === 'bubble'" class="tab-content">
           <h3>Speech Bubble Detection Parameters</h3>
           <div class="param-group" v-for="param in bubbleParams" :key="param.label">
@@ -67,13 +60,11 @@
           </div>
         </div>
 
-        <!-- Action Buttons -->
         <div class="action-buttons">
           <button class="primary" :disabled="!imageSrc || loading" @click="applyDetection">Apply Detection</button>
           <button class="secondary" :disabled="!imageSrc" @click="resetImage">Reset</button>
         </div>
 
-        <!-- Status -->
         <div v-if="loading" class="loading">Processing image, please wait...</div>
         <div v-if="error" class="error">{{ error }}</div>
       </div>
@@ -222,7 +213,7 @@ function resetImage() {
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* remove scroll */
+  overflow: hidden;
 }
 
 .tab-buttons {

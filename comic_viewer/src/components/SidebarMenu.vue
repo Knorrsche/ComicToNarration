@@ -48,7 +48,6 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <!-- Hamburger -->
   <button
     class="hamburger"
     :class="{ open: isMenuOpen }"
@@ -60,7 +59,6 @@ onBeforeUnmount(() => {
     <span></span>
   </button>
 
-  <!-- Sidebar -->
   <nav class="sidebar" :class="{ open: isMenuOpen }">
     <ul>
       <li
@@ -77,13 +75,11 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-/* Colors */
 :global(:root) {
   --orange-primary: #da7434;
   --orange-light: #ffb68a;
 }
 
-/* Hamburger */
 .hamburger {
   position: fixed;
   top: 1rem;
@@ -125,7 +121,6 @@ onBeforeUnmount(() => {
   transform: translateY(-8px) rotate(-45deg);
 }
 
-/* Sidebar */
 .sidebar {
   position: fixed;
   top: 0;

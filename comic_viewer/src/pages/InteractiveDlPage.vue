@@ -1,13 +1,10 @@
 <template>
   <div class="viewer-wrapper">
-    <!-- Title -->
     <header class="viewer-title">
       {{ title }}
     </header>
 
-    <!-- Main Content -->
     <div class="viewer">
-      <!-- Explanation -->
       <div class="explanation-box">
         <h3>Deep Learning in Comics</h3>
         <p>
@@ -26,16 +23,12 @@
           than traditional rule-based methods.
         </p>
         <p>
-          You can explore this in action with the interactive viewer, adjust parameters,
-          apply detection, and compare results to see how automated understanding of
-          comics can be both powerful and flexible in capturing the richness of the medium.
-          You can also compare the outputs of this deep learning model with the rule-based
+          You can explore this in action with the interactive viewer. You can also compare the outputs of this deep learning model with the rule-based
           detections you configured in the previous section to better understand the strengths
           and limitations of each approach.
         </p>
       </div>
 
-      <!-- Comic Panel List -->
       <div class="image-viewer">
         <ComicScrollPanel />
       </div>
@@ -62,7 +55,6 @@ const props = defineProps({
   --text-dark: #222;
 }
 
-/* Wrapper matches viewer component */
 .viewer-wrapper {
   position: relative;
   display: flex;
@@ -72,7 +64,6 @@ const props = defineProps({
   align-items: center;
 }
 
-/* Gradient Title Bar */
 .viewer-title {
   font-size: clamp(1.6rem, 2.2vw, 2.2rem);
   font-weight: 700;
@@ -98,7 +89,6 @@ const props = defineProps({
   border-radius: 2px;
 }
 
-/* Main Glassmorphic Container */
 .viewer {
   display: flex;
   width: 80%;
@@ -113,29 +103,27 @@ const props = defineProps({
   max-height: 75vh;
 }
 
-/* Explanation Box */
 .explanation-box {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 2rem;
-  overflow: hidden; /* remove scrollbar */
+  overflow: hidden;
 }
 
 .explanation-box h3 {
-  font-size: clamp(1rem, 1.5vw, 1.3rem); /* shrink title if needed */
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
   margin-bottom: 0.8rem;
   color: var(--orange);
 }
 .explanation-box p {
-  font-size: clamp(0.8rem, 1vw, 1rem); /* shrink text instead of scrolling */
+  font-size: clamp(0.8rem, 1vw, 1rem);
   line-height: 1.4;
   color: var(--text-dark);
   white-space: pre-line;
 }
 
-/* Comic Scroll Panel Wrapper */
 .image-viewer {
   flex: 1;
   display: flex;
@@ -147,7 +135,6 @@ const props = defineProps({
   padding-top: 0.5rem;
 }
 
-/* Orange scrollbar for comic list */
 .image-viewer::-webkit-scrollbar {
   width: 8px;
 }
@@ -159,13 +146,11 @@ const props = defineProps({
   background: transparent;
 }
 
-/* Ensure Select Comic text inside ComicScrollPanel is fully visible */
 .image-viewer :deep(select) {
   max-width: 100%;
   white-space: normal;
 }
 
-/* Mobile Layout */
 @media (max-width: 768px) {
   .viewer {
     flex-direction: column;
