@@ -8,6 +8,7 @@ import ComicParts from '../components/ComicParts.vue'
 import Challenges from '../components/Challenges.vue'
 import InteractiveDetectionPage from './InteractiveDetectionPage.vue'
 import InteractiveDlPage from './InteractiveDlPage.vue'
+import { nextTick } from 'vue';
 
 const sections = [
   { id: "intro", title: "Intro", component: Header },
@@ -21,16 +22,28 @@ const sections = [
 
 const scrollContainer = ref(null);
 
-const scrollToSection = (id) => {
-  const container = scrollContainer.value;
-  if (!container) return;
-  const target = container.querySelector(`#${id}`);
-  if (!target) return;
+const scrollToSection = async (id) => {
+  try {
+    await nextTick();
+    const container = scrollContainer.value;
+    if (!container) {
+      console.warn('scrollToSection: scroll container not found');
+      return;
+    }
 
-  container.scrollTo({
-    top: target.offsetTop,
-    behavior: 'smooth',
-  });
+    const target = container.querySelector(`#${id}`);
+    if (!target) {
+      console.warn(`scrollToSection: No element found with id "${id}"`);
+      return;
+    }
+
+    container.scrollTo({
+      top: target.offsetTop,
+      behavior: 'smooth',
+    });
+  } catch (err) {
+    console.error('scrollToSection error:', err);
+  }
 };
 </script>
 

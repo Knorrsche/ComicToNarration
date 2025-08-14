@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
+const emit = defineEmits(['navigate'])
+
 const props = defineProps({
   sections: {
     type: Array,
@@ -66,9 +68,15 @@ onBeforeUnmount(() => {
         :key="section.id"
         :class="{ active: activeSection === section.id }"
       >
-        <a :href="'#' + section.id" @click="isMenuOpen = window.innerWidth >= 1024 ? true : false">
-          {{ section.title }}
-        </a>
+<a
+  :href="'#' + section.id"
+  @click="() => {
+    emit('navigate', section.id)
+    isMenuOpen.value = window.innerWidth >= 1024
+  }"
+>
+  {{ section.title }}
+</a>
       </li>
     </ul>
   </nav>

@@ -38,7 +38,6 @@ const loadPage = async (comicName, pageFilename) => {
     boundingBoxes.value = extractBoxesFromXml(xmlDoc);
 
     await nextTick();
-    updateScale();
   } catch (err) {
     console.error("Error loading page:", err);
   }
@@ -46,14 +45,13 @@ const loadPage = async (comicName, pageFilename) => {
 
 onMounted(async () => {
   try {
-    const res = await fetch("http://localhost:8000/comics");
+    const res = await fetch('http://localhost:8000/comics') ;
     if (!res.ok) throw new Error("Failed to fetch comics");
     comicList.value = await res.json();
   } catch (err) {
     console.error("Error loading comic list:", err);
   }
 
-  window.addEventListener("resize", updateScale);
 });
 </script>
 
