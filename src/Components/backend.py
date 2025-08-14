@@ -37,14 +37,12 @@ app.add_middleware(
 
 
 def image_to_base64_pil(img: Image.Image) -> str:
-    """Convert PIL Image to base64 string."""
     buffered = io.BytesIO()
     img.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode()
 
 
 def image_to_base64_np(array: np.ndarray) -> str:
-    """Convert numpy image array (HWC, uint8 or bool) to base64 string."""
     if array.dtype == bool:
         array = (array * 255).astype(np.uint8)
     if array.ndim == 2:  # grayscale
@@ -69,17 +67,14 @@ async def process_image(
     min_circularity: float = Form(0.4),
     use_adaptive: bool = Form(False)
 ):
-    # Build the full path to the image
     img_path = os.path.join(DATA_DIR, comic, page)
     if not os.path.exists(img_path):
         return JSONResponse(status_code=404, content={"error": "Page not found"})
 
-    # Read image directly from disk
     img = cv2.imread(img_path)
     if img is None:
         return JSONResponse(status_code=400, content={"error": "Invalid image"})
 
-    # Run detection
     panel_img = detect_panels(img, blur, threshold, morph, min_size)
     result_img = detect_speech_bubbles(
         panel_img,
