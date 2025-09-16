@@ -174,7 +174,7 @@ async function applyDetection() {
     formData.append("bubble_max_area", detectionParams.bubbleMax);
     formData.append("min_circularity", detectionParams.minCircularity);
 
-    const res = await fetch("http://localhost:8000/api/process", {
+    const res = await fetch("https://projects.cairo.thws.de/api/api/process", {
       method: "POST",
       body: formData
     });
@@ -193,7 +193,7 @@ async function applyDetection() {
 }
 
 const fetchPages = async () => {
-  const res = await fetch('http://localhost:8000/comics');
+  const res = await fetch('https://projects.cairo.thws.de/api/comics');
   const data = await res.json();
   const selected = data.find(c => c.name === comic.value);
   if (selected) {
@@ -204,7 +204,7 @@ const fetchPages = async () => {
 
 const loadImage = async () => {
   const currentPage = pages.value[pageIndex.value];
-  originalImageSrc.value = `http://localhost:8000/comics/${comic.value}/${currentPage}`;
+  originalImageSrc.value = `https://projects.cairo.thws.de/api/comics/${comic.value}/${currentPage}`;
   imageSrc.value = originalImageSrc.value;
   detectionActive.value = false;
   await fetchAnnotationXml();
@@ -212,7 +212,7 @@ const loadImage = async () => {
 
 const fetchAnnotationXml = async () => {
   try {
-    const res = await fetch(`http://localhost:8000/comics/${comic.value}.xml`);
+    const res = await fetch(`https://projects.cairo.thws.de/api/comics/${comic.value}.xml`);
     const text = await res.text();
 
     const parser = new DOMParser();

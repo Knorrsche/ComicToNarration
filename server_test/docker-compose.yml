@@ -1,0 +1,90 @@
+version: "3.9"
+
+services:
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:ci-alpine
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - CADDY_INGRESS_NETWORKS=caddy
+    networks:
+      - caddy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - C:/Users/derra/PycharmProjects/ComicToNarration/server_test/caddy_data:/data
+    restart: unless-stopped
+
+  nginx:
+    image: nginx
+    networks:
+      - caddy
+    labels:
+      caddy: projects.cairo.thws.de
+      caddy.handle_path: /asml*
+      caddy.handle_path.0_reverse_proxy: "{{upstreams 80}}"
+      caddy.tls: "internal"
+    volumes:
+      - C:/Users/derra/PycharmProjects/ComicToNarration/server_test/nginx/html:/usr/share/nginx/html
+      - C:/Users/derra/PycharmProjects/ComicToNarration/server_test/nginx/conf:/etc/nginx/conf.d
+
+  whoami:
+    image: traefik/whoami
+    networks:
+      - caddy
+    labels:
+      caddy: projects.cairo.thws.de
+      caddy.handle_path: /whoami*
+      caddy.handle_path.0_reverse_proxy: "{{upstreams}}"
+      caddy.tls: "internal"
+
+  comic_backend:
+    build:
+      context: ../src
+      dockerfile: Dockerfile
+    container_name: comic_backend
+    volumes:
+      - C:/Users/derra/PycharmProjects/ComicToNarration:/app
+    working_dir: /app
+    command: uvicorn src.Components.backend:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      - PYTHONPATH=/app
+    networks:
+      - app_net
+      - caddy
+    labels:
+      caddy: projects.cairo.thws.de
+      caddy.handle_path: /api*
+      caddy.handle_path.0_reverse_proxy: "{{upstreams 8000}}"
+      caddy.tls: internal
+
+  comic_frontend:
+    build:
+      context: ../comic_viewer
+      dockerfile: Dockerfile
+    container_name: comic_frontend
+    labels:
+      caddy: projects.cairo.thws.de
+      caddy.handle: /comic/*
+      caddy.handle.0_reverse_proxy: "{{upstreams 5173}}"
+      caddy.tls: "internal"
+    volumes:
+      - C:/Users/derra/PycharmProjects/ComicToNarration/comic_viewer/src:/app/src
+      - C:/Users/derra/PycharmProjects/ComicToNarration/comic_viewer/public:/app/public
+      - C:/Users/derra/PycharmProjects/ComicToNarration/comic_viewer/package.json:/app/package.json
+      - C:/Users/derra/PycharmProjects/ComicToNarration/comic_viewer/package-lock.json:/app/package-lock.json
+    working_dir: /app
+    command: npm run dev -- --host 0.0.0.0 --port 5173
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - comic_backend
+    networks:
+      - app_net
+      - caddy
+
+networks:
+  caddy:
+    external: true
+  app_net:
+    driver: bridge

@@ -126,7 +126,7 @@ async function applyDetection() {
     formData.append("bubble_max_area", detectionParams.bubbleMax);
     formData.append("min_circularity", detectionParams.minCircularity);
 
-    const serverRes = await fetch("http://localhost:8000/api/process", {
+    const serverRes = await fetch("https://projects.cairo.thws.de/api/api/process", {
       method: "POST",
       body: formData
     });

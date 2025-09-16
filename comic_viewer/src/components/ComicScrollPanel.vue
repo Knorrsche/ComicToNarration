@@ -26,7 +26,7 @@ const selectPage = (page) => {
 const loadPage = async (comicName, pageFilename) => {
   try {
     const response = await fetch(
-      `http://localhost:8000/comic-page?comic=${encodeURIComponent(comicName)}&page=${encodeURIComponent(pageFilename)}`
+      `https://projects.cairo.thws.de/comic-page?comic=${encodeURIComponent(comicName)}&page=${encodeURIComponent(pageFilename)}`
     );
     if (!response.ok) throw new Error("Failed to load comic page");
 
@@ -45,7 +45,7 @@ const loadPage = async (comicName, pageFilename) => {
 
 onMounted(async () => {
   try {
-    const res = await fetch('http://localhost:8000/comics') ;
+    const res = await fetch('https://projects.cairo.thws.de/api/comics') ;
     if (!res.ok) throw new Error("Failed to fetch comics");
     comicList.value = await res.json();
   } catch (err) {
@@ -69,7 +69,7 @@ onMounted(async () => {
         @click="goToViewer(comic.name)"
       >
         <img
-          :src="`http://localhost:8000/comics/${comic.name}/${comic.pages[0]}`"
+          :src="`https://projects.cairo.thws.de/api/comics/${comic.name}/${comic.pages[0]}`"
           alt="preview"
           class="comic-thumbnail"
         />

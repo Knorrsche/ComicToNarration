@@ -3,8 +3,6 @@ import os
 import cv2
 import uvicorn
 from starlette.responses import StreamingResponse
-
-from src.Components.comic_reader import ComicReader
 import numpy as np
 from PIL import Image
 import io
@@ -17,14 +15,13 @@ from fastapi.staticfiles import StaticFiles
 from src.Components.cv_panel import detect_panels, detect_speech_bubbles
 
 app = FastAPI()
-#ComicReader = ComicReader()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", r"Data/comics"))
 
 app.mount("/comics", StaticFiles(directory=DATA_DIR), name="comics")
 
-origins = ["http://localhost:5173"]
+origins = ["http://localhost:5173","projects.cairo.thws.de"]
 
 app.add_middleware(
     CORSMiddleware,
